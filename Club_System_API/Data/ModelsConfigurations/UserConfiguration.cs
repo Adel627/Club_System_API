@@ -22,6 +22,8 @@ namespace Club_System_API.Data.ModelsConfigurations
         builder.HasData(new ApplicationUser
         {
             MembershipNumber = "Admin7",
+            PhoneNumber= "01120443096",
+            PhoneNumberConfirmed=true,
             Id = DefaultUsers.AdminId,
             FirstName = "Club System",
             LastName = "Admin",

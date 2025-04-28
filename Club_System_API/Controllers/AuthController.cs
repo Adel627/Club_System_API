@@ -13,7 +13,17 @@ namespace Club_System_API.Controllers
         private readonly IAuthService _authService = authService;
         private readonly ITwilioService _twilioService = twilioService;
 
-        [HttpPost("")]
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _authService.RegisterAsync(request, cancellationToken);
+
+            return result.IsSuccess ? Ok(result) : result.ToProblem();
+        }
+
+
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
         {
 
@@ -38,16 +48,8 @@ namespace Club_System_API.Controllers
 
             return result.IsSuccess ? Ok() : result.ToProblem();
         }
-        [HttpPost("register")]
-        public async Task<IActionResult> Register( RegisterRequest request, CancellationToken cancellationToken)
-        {
-            var result = await _authService.RegisterAsync(request, cancellationToken);
-
-            return result.IsSuccess ? Ok(result) : result.ToProblem();
-        }
-
-
-        [HttpPost("start")]
+   
+        [HttpPost("sendverificationOTP")]
         public async Task<IActionResult> StartVerification([FromBody] PhoneRequest request)
         {
             await _twilioService.SendVerificationCodeAsync(request.PhoneNumber);
@@ -65,14 +67,6 @@ namespace Club_System_API.Controllers
 
             return Ok(new { message = "Phone number verified successfully." });
         }
-
-        [HttpPost("send")]
-        public async Task<IActionResult> SendMessage([FromBody] MessageRequest request)
-        {
-            await _twilioService.SendMessageAsync(request.PhoneNumber, request.Message);
-            return Ok(new { message = "Message sent successfully." });
-        }
-
 
     }
 }

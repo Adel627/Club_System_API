@@ -11,7 +11,6 @@ public interface IUserService
     Task<Result<AddingUserResponse>> AddAsync(CreateUserRequest request, CancellationToken cancellationToken = default);
    
     Task<Result> ToggleStatus(string id);
-    Task<Result> Unlock(string id);
     Task<Result<UserProfileResponse>> GetProfileAsync(string userId);
     Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request);
     Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request);

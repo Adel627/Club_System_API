@@ -20,5 +20,10 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
         RuleFor(x => x.LastName)
             .NotEmpty()
             .Length(3, 100);
+
+        RuleFor(x => x.PhoneNumber)
+            .NotEmpty();
+
+        RuleFor(x => x.IsMember).NotEmpty();
     }
 }

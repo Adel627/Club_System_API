@@ -14,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<CoachRating> CoachRatings { get; set; }
+    public DbSet<QA> QAs { get; set; }
    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

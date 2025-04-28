@@ -1,5 +1,4 @@
-﻿
-using Club_System_API.Abstractions.Consts;
+﻿using Club_System_API.Abstractions.Consts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

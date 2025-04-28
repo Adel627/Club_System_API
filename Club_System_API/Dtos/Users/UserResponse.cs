@@ -3,6 +3,8 @@
 public record UserResponse(
     string Id,
     string MembershipNumber,
+     string PhoneNumber,
+     bool  PhoneNumberConfirmed,
     string FirstName,
     string LastName,
     DateOnly Birth_Of_Date,

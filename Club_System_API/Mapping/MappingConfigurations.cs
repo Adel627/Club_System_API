@@ -2,7 +2,6 @@
 using Mapster;
 using Club_System_API.Dtos.Authentication;
 using Club_System_API.Dtos.Users;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.IO;
 using Club_System_API.Helper;
 using Club_System_API.Dtos.Service;
@@ -23,6 +22,9 @@ namespace Club_System_API.Mapping
                 .Map(dest => dest.Image, src => src.Image);
 
             config.NewConfig<CreateUserRequest, ApplicationUser>()
+                .Map(dest => dest.Image, src => src.Image);
+
+            config.NewConfig<ApplicationUser,UserProfileResponse>()
                 .Map(dest => dest.Image, src => src.Image);
 
             config.NewConfig<CoachRequest, Coach>()

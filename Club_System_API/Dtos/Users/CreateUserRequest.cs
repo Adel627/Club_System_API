@@ -3,9 +3,9 @@
 public record CreateUserRequest(
     string FirstName,
     string LastName,
-    DateOnly Birth_Of_Date ,
-    DateOnly? Renewal_date,
-    IFormFile? Image ,
     string PhoneNumber,
-    string Password
+    DateOnly Birth_Of_Date ,
+    IFormFile? Image ,
+    string Password,
+    bool IsMember
 );

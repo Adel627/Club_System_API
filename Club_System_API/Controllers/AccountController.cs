@@ -18,18 +18,21 @@ namespace Club_System_API.Controllers
         [HttpGet("")]
         public async Task<IActionResult> Info()
         {
+          
             var result = await _userService.GetProfileAsync(User.GetUserId()!);
 
             return Ok(result.Value);
         }
 
         [HttpPut("info")]
-        public async Task<IActionResult> Info([FromBody] UpdateProfileRequest request)
+        public async Task<IActionResult> InfoUpdate([FromBody] UpdateProfileRequest request)
         {
             await _userService.UpdateProfileAsync(User.GetUserId()!, request);
 
             return NoContent();
         }
+
+      
 
         [HttpPut("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)

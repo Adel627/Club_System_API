@@ -31,6 +31,35 @@ namespace Club_System_API.Services.Authentication
         private readonly int _refreshTokenExpiryDays = 14;
         private readonly ITwilioService _twilioService = twilioService;
 
+
+        public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+        {
+            var PhoneNumberIsExist = await _context.Users.AnyAsync(p => p.PhoneNumber == request.PhoneNumber, cancellationToken);
+
+            if (PhoneNumberIsExist)
+                return Result.Failure(UserErrors.DuplicatedPhoneNumber);
+
+
+            var user = request.Adapt<ApplicationUser>();
+            user.MembershipNumber = GenerateMembershipNumberExtensions.GenerateMembershipNumber();
+            user.UserName = user.MembershipNumber;
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+
+
+            if (result.Succeeded)
+            {
+                await _twilioService.SendVerificationCodeAsync(request.PhoneNumber);
+
+                return Result.Success();
+            }
+
+            var error = result.Errors.First();
+
+            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+
+        }
+
         public async Task<Result<AuthResponse>> GetTokenAsync(string PhoneNumber, string password, CancellationToken cancellationToken = default)
         {
             if (await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == PhoneNumber) is not { } user) { 
@@ -48,9 +77,9 @@ namespace Club_System_API.Services.Authentication
 
             if (result.Succeeded)
             {
-                var (userRoles, userPermissions) = await GetUserRolesAndPermissions(user, cancellationToken);
+                var userRoles = await _userManager.GetRolesAsync(user); 
 
-                var (token, expiresIn) = _jwtProvider.GenerateToken(user, userRoles, userPermissions);
+                var (token, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
                 var refreshToken = GenerateRefreshToken();
                 var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
@@ -101,9 +130,9 @@ namespace Club_System_API.Services.Authentication
 
             userRefreshToken.RevokedOn = DateTime.UtcNow;
 
-            var (userRoles, userPermissions) = await GetUserRolesAndPermissions(user, cancellationToken);
+            var userRoles = await _userManager.GetRolesAsync(user);
 
-            var (newToken, expiresIn) = _jwtProvider.GenerateToken(user, userRoles, userPermissions);
+            var (newToken, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
             var newRefreshToken = GenerateRefreshToken();
             var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
@@ -144,54 +173,14 @@ namespace Club_System_API.Services.Authentication
             return Result.Success();
         }
 
-        public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
-        {
-            var PhoneNumberIsExist = await _context.Users.AnyAsync(p => p.PhoneNumber == request.PhoneNumber,cancellationToken);  
-            
-            if(PhoneNumberIsExist)
-                return Result.Failure( UserErrors.DuplicatedPhoneNumber);
-
-            
-           var user =  request.Adapt<ApplicationUser>();
-            user.MembershipNumber = GenerateMembershipNumberExtensions.GenerateMembershipNumber();
-            user.UserName = user.MembershipNumber;
-
-            var result = await _userManager.CreateAsync(user, request.Password);
-
-
-            if (result.Succeeded)
-            {
-                 await _twilioService.SendVerificationCodeAsync(request.PhoneNumber);
-
-                return Result.Success();
-            }
-
-            var error = result.Errors.First();
-
-            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
-        
-        }
-
+      
 
         private static string GenerateRefreshToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
 
-        private async Task<(IEnumerable<string> roles, IEnumerable<string> permissions)> GetUserRolesAndPermissions(ApplicationUser user, CancellationToken cancellationToken)
-        {
-            var userRoles = await _userManager.GetRolesAsync(user);    
-
-            var userPermissions = await (from r in _context.Roles
-                                         join p in _context.RoleClaims
-                                         on r.Id equals p.RoleId
-                                         where userRoles.Contains(r.Name!)
-                                         select p.ClaimValue!)
-                                         .Distinct()
-                                         .ToListAsync(cancellationToken);
-
-            return (userRoles, userPermissions);
-        }
+     
        
 
     }

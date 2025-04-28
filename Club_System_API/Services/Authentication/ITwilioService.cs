@@ -4,6 +4,5 @@
     {
         Task SendVerificationCodeAsync(string phoneNumber);
         Task<bool> CheckVerificationCodeAsync(string phoneNumber, string code);
-        Task SendMessageAsync(string phoneNumber, string message);
     }
 }

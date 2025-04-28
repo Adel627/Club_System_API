@@ -5,7 +5,7 @@ namespace Club_System_API.Errors
     public static class UserErrors
     {
         public static readonly Error InvalidCredentials =
-         new("User.InvalidCredentials", "Invalid MembershipNumber/password", StatusCodes.Status401Unauthorized);
+         new("User.InvalidCredentials", "Invalid PhoneNumber/password", StatusCodes.Status401Unauthorized);
 
         public static readonly Error DisabledUser =
             new("User.DisabledUser", "Disabled user, please contact your administrator", StatusCodes.Status401Unauthorized);

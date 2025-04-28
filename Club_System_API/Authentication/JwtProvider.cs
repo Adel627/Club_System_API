@@ -11,18 +11,16 @@ namespace Club_System_API.Authentication {
     {
         private readonly JwtOptions _options = options.Value;
 
-        public (string token, int expiresIn) GenerateToken(ApplicationUser user, IEnumerable<string> roles, IEnumerable<string> permissions)
+        public (string token, int expiresIn) GenerateToken(ApplicationUser user, IEnumerable<string> roles)
         {
+
             Claim[] claims = [
                 new(JwtRegisteredClaimNames.Sub, user.Id),
-           new(JwtRegisteredClaimNames.Email, user.MembershipNumber!),
             new(JwtRegisteredClaimNames.GivenName, user.FirstName),
             new(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(nameof(roles), JsonSerializer.Serialize(roles), JsonClaimValueTypes.JsonArray),
-            new(nameof(permissions), JsonSerializer.Serialize(permissions), JsonClaimValueTypes.JsonArray)
             ];
-
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
 
             var singingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
@@ -30,7 +28,7 @@ namespace Club_System_API.Authentication {
             var token = new JwtSecurityToken(
                 issuer: _options.Issuer,
                 audience: _options.Audience,
-                claims: claims,
+               claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(_options.ExpiryMinutes),
                 signingCredentials: singingCredentials
             );
@@ -51,6 +49,7 @@ namespace Club_System_API.Authentication {
                     ValidateIssuerSigningKey = true,
                     ValidateIssuer = false,
                     ValidateAudience = false,
+                
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 

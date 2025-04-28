@@ -2,12 +2,14 @@
 using Club_System_API.Abstractions.Consts;
 using Club_System_API.Dtos.Users;
 using Club_System_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Club_System_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles =nameof(DefaultRoles.Admin))]
     public class UsersController(IUserService userService) : ControllerBase
     {
         private readonly IUserService _userService = userService;
@@ -43,12 +45,7 @@ namespace Club_System_API.Controllers
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 
-        [HttpPut("{id}/unlock")]
-        public async Task<IActionResult> Unlock([FromRoute] string id)
-        {
-            var result = await _userService.Unlock(id);
-            return result.IsSuccess ? NoContent() : result.ToProblem();
-        }
+    
 
     }
 }
