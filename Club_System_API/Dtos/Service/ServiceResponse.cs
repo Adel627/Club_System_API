@@ -9,8 +9,5 @@ namespace Club_System_API.Dtos.Service
          decimal Price, 
         string Description ,
         byte[]? Image
-        //List<UserResponse> Users,
-        //List<coach>
-        
     );
 }

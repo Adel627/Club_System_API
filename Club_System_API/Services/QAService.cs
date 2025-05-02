@@ -35,7 +35,7 @@ namespace Club_System_API.Services
 
         public async Task<IEnumerable<QAResponse>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.QAs
+            return await _context.QAs.OrderBy(x=>x.SortNum)
            .AsNoTracking()
            .ProjectToType<QAResponse>()
            .ToListAsync(cancellationToken);

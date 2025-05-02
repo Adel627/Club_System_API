@@ -1,6 +1,7 @@
 ﻿using Club_System_API.Abstractions;
 using Club_System_API.Dtos.Service;
 using Club_System_API.Errors;
+using Club_System_API.Helper;
 using Club_System_API.Models;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ namespace Club_System_API.Services.service
             _context = context;
         }
 
-        public async Task<Result<ServiceResponse>> AddAsync([FromForm] CoachRequest serviceRequest, CancellationToken cancellationToken = default)
+        public async Task<Result<ServiceResponse>> AddAsync([FromForm] ServiceRequest serviceRequest, CancellationToken cancellationToken = default)
         {
             var service = serviceRequest.Adapt<Service>(); 
            await _context.AddAsync(service,cancellationToken);
@@ -43,7 +44,7 @@ namespace Club_System_API.Services.service
                 : Result.Failure<ServiceResponse>(ServiceErrors.ServiceNotFound);
         }
 
-        public async Task<Result> UpdateAsync(int id, CoachRequest request, CancellationToken cancellationToken = default)
+        public async Task<Result> UpdateAsync(int id, ServiceRequest request, CancellationToken cancellationToken = default)
         {
 
             var currentService = await _context.Services.FindAsync(id, cancellationToken);
@@ -54,6 +55,7 @@ namespace Club_System_API.Services.service
             currentService.Name = request.Name;
             currentService.Price = request.Price;
             currentService.Description = request.Description;
+            currentService.Image= FormFileExtensions.ConvertToBytes(request.Image);
 
             await _context.SaveChangesAsync(cancellationToken);
 

@@ -2,7 +2,7 @@
 
 namespace Club_System_API.Dtos.Service
 {
-    public class ServiceRequestValidator:AbstractValidator<CoachRequest>
+    public class ServiceRequestValidator:AbstractValidator<ServiceRequest>
     {
         public ServiceRequestValidator()
         {

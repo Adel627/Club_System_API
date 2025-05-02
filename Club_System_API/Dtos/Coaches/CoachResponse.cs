@@ -9,6 +9,8 @@
          bool IsDisabled,
          string PhoneNumber,
          int Salary,
+         double AverageRating,
          byte[]? Image
+         
         );
 }

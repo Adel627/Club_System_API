@@ -30,10 +30,10 @@ namespace Club_System_API
 
             services.AddCors(options =>
            options.AddDefaultPolicy(builder =>
-               builder
+               builder.AllowAnyOrigin()
                    .AllowAnyMethod()
                    .AllowAnyHeader()
-                   .WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!)
+                   //.WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!)
                 ) );
 
             services.AddAuthConfig(configuration);
@@ -56,8 +56,8 @@ namespace Club_System_API
 
             services.AddScoped<IAuthService, AuthService>();                       
             services.AddScoped<IServiceService, ServiceService>();
-            services.AddScoped<ICoachService, Services.CoachService>();
-           
+            services.AddScoped<ICoachService, CoachService>();
+            services.AddScoped<ICoachRatingService, CoachRatingService>();
             services.AddScoped<IQAService, QAService>();
            
             services.AddScoped<IUserService,Services.UserService>();

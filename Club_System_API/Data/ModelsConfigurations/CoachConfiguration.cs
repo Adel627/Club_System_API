@@ -11,6 +11,7 @@ namespace Club_System_API.Data.ModelsConfigurations
             builder.Property(x => x.Specialty).HasMaxLength(100);
             builder.Property(x => x.Bio).HasMaxLength(1500);
             builder.HasIndex(x => x.PhoneNumber).IsUnique();
+            builder.Property(x => x.AverageRating).HasDefaultValue(0);
 
         }
     }

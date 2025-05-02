@@ -8,8 +8,8 @@ namespace Club_System_API.Services.service
     {
         Task<IEnumerable<ServiceResponse>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<Result<ServiceResponse>> GetAsync(int id, CancellationToken cancellationToken = default);
-        Task<Result< ServiceResponse>> AddAsync(CoachRequest Service, CancellationToken cancellationToken = default);
-        Task<Result> UpdateAsync(int id, CoachRequest ServiceRequest, CancellationToken cancellationToken = default);
+        Task<Result< ServiceResponse>> AddAsync(ServiceRequest Service, CancellationToken cancellationToken = default);
+        Task<Result> UpdateAsync(int id, ServiceRequest ServiceRequest, CancellationToken cancellationToken = default);
         Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default);
     }
 }

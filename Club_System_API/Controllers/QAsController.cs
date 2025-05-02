@@ -12,13 +12,12 @@ namespace Club_System_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = nameof( DefaultRoles.Admin))]  
     public class QAsController(IQAService QAService) : ControllerBase
     {
         private readonly IQAService _QAService=QAService;
 
 
-
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpPost]
         public async Task<IActionResult> Add( QARequest request,
        CancellationToken cancellationToken)
@@ -28,12 +27,14 @@ namespace Club_System_API.Controllers
 
         }
 
+
         [HttpGet("")]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
             return Ok(await _QAService.GetAllAsync(cancellationToken));
         }
 
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
         {
@@ -41,6 +42,8 @@ namespace Club_System_API.Controllers
 
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
+
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] QARequest request,
@@ -50,6 +53,8 @@ namespace Club_System_API.Controllers
 
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
+
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)

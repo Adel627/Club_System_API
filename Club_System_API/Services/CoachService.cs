@@ -23,7 +23,7 @@ namespace Club_System_API.Services
                return Result.Failure<CoachResponse>(CoachErrors.DuplicatedPhoneNumber);
 
             var coach = request.Adapt<Coach>();
-            await _context.AddAsync(coach, cancellationToken);
+          await _context.AddAsync(coach, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success(coach.Adapt<CoachResponse>());
         }
@@ -53,7 +53,7 @@ namespace Club_System_API.Services
             if (currentCoach is null)
                 return Result.Failure(CoachErrors.CoachNotFound);
 
-               currentCoach.FirstName = request.FirstName;
+            currentCoach.FirstName = request.FirstName;
             currentCoach.LastName = request.LastName;
             currentCoach.Specialty = request.Specialty;
             currentCoach.Bio=request.Bio;
@@ -80,12 +80,5 @@ namespace Club_System_API.Services
 
         }
 
-        public async Task<Result> AssignServiceToCoach(int coachId, int serviceId)
-        {
-            var coachService = new Models.ServiceCoach { CoachId = coachId, ServiceId = serviceId };
-             await  _context.ServiceCoaches.AddAsync(coachService);
-            await _context.SaveChangesAsync();
-            return Result.Success();
-        }
     }
 }

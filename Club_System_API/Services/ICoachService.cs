@@ -9,8 +9,7 @@ namespace Club_System_API.Services
         Task<Result<CoachResponse>> GetAsync(int id, CancellationToken cancellationToken = default);
         Task<Result<CoachResponse>> AddAsync(CoachRequest coachRequest, CancellationToken cancellationToken = default);
         Task<Result> UpdateAsync(int id, CoachRequest coachRequest, CancellationToken cancellationToken = default);
-       Task<Result> ToggleStatus(int id);
-        Task<Result> AssignServiceToCoach(int coachId, int serviceId);
+        Task<Result> ToggleStatus(int id);
 
     }
 }

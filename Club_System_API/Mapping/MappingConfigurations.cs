@@ -5,6 +5,7 @@ using Club_System_API.Dtos.Users;
 using System.IO;
 using Club_System_API.Helper;
 using Club_System_API.Dtos.Service;
+using Club_System_API.Dtos.Coaches;
 
 
 namespace Club_System_API.Mapping
@@ -27,9 +28,13 @@ namespace Club_System_API.Mapping
             config.NewConfig<ApplicationUser,UserProfileResponse>()
                 .Map(dest => dest.Image, src => src.Image);
 
-            config.NewConfig<CoachRequest, Coach>()
+            config.NewConfig<ServiceRequest, Service>()
               .Map(dest => dest.Image, src => src.Image);
-      
+
+
+            config.NewConfig<CoachRequest,Coach>()
+              .Map(dest => dest.Image, src => src.Image);
+
 
 
 
