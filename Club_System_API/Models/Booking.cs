@@ -17,6 +17,14 @@ namespace Club_System_API.Models
 
         public int AppointmentId { get; set; }
         public Appointment Appointment { get; set; } = default!;
+
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+
+        public string Status { get; set; } = "Pending"; // Pending, Confirmed, Cancelled, Completed
+        public bool IsPaid { get; set; } = false;
+
+
     }
 
 }

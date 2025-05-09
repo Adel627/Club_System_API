@@ -1,0 +1,19 @@
+﻿namespace Club_System_API.Models
+{
+    public class Membership
+    {
+        //public int Id { get; set; }
+        //public string UserId { get; set; }
+        //public ApplicationUser User { get; set; } = null!;
+        //public string Type { get; set; } = "Yearly"; 
+        //public DateTime StartDate { get; set; }
+        //public DateTime EndDate { get; set; }
+        //public bool IsActive => DateTime.UtcNow >= StartDate && DateTime.UtcNow <= EndDate;
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
+        public decimal Price { get; set; }
+        public int DurationInDays { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+}
