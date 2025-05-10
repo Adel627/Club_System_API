@@ -17,6 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<QA> QAs { get; set; }
 
     public DbSet<Membership> Memberships { get; set; }
+    public DbSet<MembershipPayment> MembershipPayments { get; set; }
     public DbSet<UserMembership> UserMemberships { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
