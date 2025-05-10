@@ -1,5 +1,7 @@
 
+using Club_System_API.Helper;
 using Club_System_API.Services;
+using Stripe;
 
 namespace Club_System_API
 {
@@ -10,8 +12,9 @@ namespace Club_System_API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDependencies(builder.Configuration);        
-           
+            builder.Services.AddDependencies(builder.Configuration);
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

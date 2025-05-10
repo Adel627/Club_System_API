@@ -15,5 +15,9 @@ namespace Club_System_API.Models
         public List<RefreshToken> RefreshTokens { get; set; } = [];
         public ICollection<CoachRating> CoachRating { get; set; } = default!;
         public ICollection<Booking> Bookings { get; set; } = default!;
+        public int? MembershipId { get; set; }
+        public Membership? Membership { get; set; }
+        public DateTime? MembershipStartDate { get; set; }
+        public DateTime? MembershipEndDate { get; set; }
     }
 }
