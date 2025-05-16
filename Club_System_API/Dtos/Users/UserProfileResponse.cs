@@ -6,6 +6,8 @@ public record UserProfileResponse(
     string FirstName,
     string LastName,
     DateOnly Birth_Of_Date,
-    DateOnly? Renewal_date,
+    int? MembershipId,
+    DateTime? MembershipStartDate,
+    DateTime? MembershipEndDate,
     byte[]? Image
 );

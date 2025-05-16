@@ -51,8 +51,7 @@ namespace Club_System_API
 
 
             // Add services to the container.
-            services.Configure<TwilioSettings>(configuration.GetSection("Twilio"));
-            services.AddScoped<ITwilioService, TwilioService>();
+
 
             services.AddScoped<IAuthService, AuthService>();                       
             services.AddScoped<IServiceService, ServiceService>();

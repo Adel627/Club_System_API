@@ -3,13 +3,14 @@
 public record UserResponse(
     string Id,
     string MembershipNumber,
-     string PhoneNumber,
-     bool  PhoneNumberConfirmed,
+    string PhoneNumber,
     string FirstName,
     string LastName,
     DateOnly Birth_Of_Date,
-    DateOnly? Renewal_date,
     byte[]? Image,
+    int? MembershipId,
+    DateTime? MembershipStartDate,
+    DateTime? MembershipEndDate,
     bool IsDisabled,
     IEnumerable<string> Roles
 );

@@ -1,6 +1,5 @@
 ﻿using Club_System_API.Abstractions;
 using Club_System_API.Dtos.Authentication;
-using Club_System_API.Dtos.PhoneVerification;
 using Club_System_API.Services.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +7,9 @@ namespace Club_System_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController (IAuthService authService,ITwilioService twilioService) : ControllerBase
+    public class AuthController (IAuthService authService) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
-        private readonly ITwilioService _twilioService = twilioService;
 
 
         [HttpPost("register")]
@@ -47,25 +45,6 @@ namespace Club_System_API.Controllers
             var result = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
 
             return result.IsSuccess ? Ok() : result.ToProblem();
-        }
-   
-        [HttpPost("sendverificationOTP")]
-        public async Task<IActionResult> StartVerification([FromBody] PhoneRequest request)
-        {
-            await _twilioService.SendVerificationCodeAsync(request.PhoneNumber);
-            return Ok(new { message = "Verification code sent." });
-        }
-
-        [HttpPost("verify")]
-        public async Task<IActionResult> VerifyCode([FromBody] VerifyRequest request)
-        {
-            var isVerified = await _twilioService.CheckVerificationCodeAsync(request.PhoneNumber, request.Code);
-
-            if (!isVerified)
-                return BadRequest(new { message = "Invalid verification code." });
-         
-
-            return Ok(new { message = "Phone number verified successfully." });
         }
 
     }

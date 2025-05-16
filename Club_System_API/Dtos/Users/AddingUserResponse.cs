@@ -6,7 +6,6 @@
     string FirstName,
     string LastName,
     DateOnly Birth_Of_Date,
-    DateOnly? Renewal_date,
     byte[]? Image,
     bool IsDisabled
     

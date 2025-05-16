@@ -74,27 +74,29 @@ public class UserService(UserManager<ApplicationUser> userManager,
                         u.Id,
                         u.MembershipNumber,
                         u.PhoneNumber,
-                        u.PhoneNumberConfirmed,
                         u.FirstName,
                         u.LastName,
                         u.Birth_Of_Date,
-                        u.Renewal_date,
+                        u.MembershipId,
+                        u.MembershipStartDate,
+                        u.MembershipEndDate,
                         u.Image,
                         u.IsDisabled,
                         RoleName = r != null ? r.Name : null
                     })
-                    .GroupBy(u => new { u.Id,u.PhoneNumber,u.PhoneNumberConfirmed, u.FirstName, u.LastName, u.MembershipNumber, u.Birth_Of_Date, u.Renewal_date, u.Image, u.IsDisabled })
+                    .GroupBy(u => new { u.Id,u.PhoneNumber, u.FirstName, u.LastName, u.MembershipNumber, u.Birth_Of_Date, u.Image, u.MembershipId,u.MembershipStartDate,u.MembershipEndDate,  u.IsDisabled })
                     .Select(u => new UserResponse
                     (
                         u.Key.Id,
                         u.Key.MembershipNumber,
                         u.Key.PhoneNumber,
-                        u.Key.PhoneNumberConfirmed,
                         u.Key.FirstName,
                         u.Key.LastName,
                         u.Key.Birth_Of_Date,
-                        u.Key.Renewal_date,
                         u.Key.Image,
+                        u.Key.MembershipId,
+                        u.Key.MembershipStartDate,
+                        u.Key.MembershipEndDate,
                         u.Key.IsDisabled,
                         u.Where(x => x.RoleName != null).Select(x => x.RoleName).Distinct().ToList() // Ensure distinct roles
                     ))
@@ -120,7 +122,6 @@ public class UserService(UserManager<ApplicationUser> userManager,
         var user = request.Adapt<ApplicationUser>();
         user.MembershipNumber = GenerateMembershipNumberExtensions.GenerateMembershipNumber();
         user.UserName = user.MembershipNumber;
-        user.PhoneNumberConfirmed = true;   
         var result = await _userManager.CreateAsync(user, request.Password);
 
         if (result.Succeeded && request.IsMember)

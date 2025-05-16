@@ -8,7 +8,6 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Club_System_API.Abstractions;
 using Club_System_API.Helper;
-using Twilio.Types;
 
 
 namespace Club_System_API.Services.Authentication
@@ -19,7 +18,7 @@ namespace Club_System_API.Services.Authentication
     SignInManager<ApplicationUser> signInManager,
     IJwtProvider jwtProvider,
     IHttpContextAccessor httpContextAccessor,
-    ApplicationDbContext context,ITwilioService twilioService) : IAuthService
+    ApplicationDbContext context) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
@@ -29,7 +28,6 @@ namespace Club_System_API.Services.Authentication
         private readonly ApplicationDbContext _context = context;
 
         private readonly int _refreshTokenExpiryDays = 14;
-        private readonly ITwilioService _twilioService = twilioService;
 
 
         public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
@@ -41,15 +39,13 @@ namespace Club_System_API.Services.Authentication
 
 
             var user = request.Adapt<ApplicationUser>();
-            user.MembershipNumber = GenerateMembershipNumberExtensions.GenerateMembershipNumber();
-            user.UserName = user.MembershipNumber;
+            user.UserName = user.PhoneNumber;
 
             var result = await _userManager.CreateAsync(user, request.Password);
 
 
             if (result.Succeeded)
             {
-                await _twilioService.SendVerificationCodeAsync(request.PhoneNumber);
 
                 return Result.Success();
             }
@@ -70,8 +66,6 @@ namespace Club_System_API.Services.Authentication
             if (user.IsDisabled)
                 return Result.Failure<AuthResponse>(UserErrors.DisabledUser);
 
-            if (!user.PhoneNumberConfirmed)
-                return Result.Failure<AuthResponse>(UserErrors.PhoneNumberNotConfirmed);
 
             var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
 
@@ -91,7 +85,8 @@ namespace Club_System_API.Services.Authentication
 
                 await _userManager.UpdateAsync(user);
 
-                var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName,user.Birth_Of_Date,user.Image,user.PhoneNumber,user.Renewal_date, token, expiresIn, refreshToken, refreshTokenExpiration);
+                var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName,user.Birth_Of_Date,user.Image,user.PhoneNumber,
+                    user.MembershipId,user.MembershipStartDate,user.MembershipEndDate, token, expiresIn, refreshToken, refreshTokenExpiration);
 
                 return Result.Success(response);
             }
@@ -144,7 +139,8 @@ namespace Club_System_API.Services.Authentication
 
             await _userManager.UpdateAsync(user);
 
-            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date, user.Image, user.PhoneNumber, user.Renewal_date, newToken, expiresIn, newRefreshToken, refreshTokenExpiration);
+            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date, user.Image, user.PhoneNumber,user.MembershipId,user.MembershipStartDate,user.MembershipEndDate,
+                newToken, expiresIn, newRefreshToken, refreshTokenExpiration);
 
             return Result.Success(response);
         }
