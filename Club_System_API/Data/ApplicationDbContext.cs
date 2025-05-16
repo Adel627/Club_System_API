@@ -15,6 +15,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<CoachRating> CoachRatings { get; set; }
     public DbSet<QA> QAs { get; set; }
+    public DbSet<ServiceReview> ServiceReviews { get; set; }
 
     public DbSet<Membership> Memberships { get; set; }
     public DbSet<MembershipPayment> MembershipPayments { get; set; }

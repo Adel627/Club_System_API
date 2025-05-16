@@ -10,18 +10,41 @@ namespace Club_System_API.Services
 {
     public class ServiceCoachService(ApplicationDbContext context) : IServiceCoachService
     {
-        private readonly ApplicationDbContext context = context;
+        private readonly ApplicationDbContext _context = context;
 
-        public async Task<Result<ServiceCoachResponse>> AddAsync(ServiceCoachRequest request, CancellationToken cancellationToken = default)
+        public async Task<Result> AddCoachToServiceAsync(ServiceCoachRequest request, CancellationToken cancellationToken = default)
         {
-            var PhonenumberIsExist = await _context.Coachs.AnyAsync(x => x.PhoneNumber == request.PhoneNumber);
-            if (PhonenumberIsExist)
-                return Result.Failure<CoachResponse>(CoachErrors.DuplicatedPhoneNumber);
+            var coach = await _context.Coachs.FindAsync(request.CoachId,cancellationToken);
+            var service = await _context.Services.Include(s => s.coaches).FirstOrDefaultAsync(s => s.Id == request.ServiceId,cancellationToken);
 
-            var coach = request.Adapt<Coach>();
-            await _context.AddAsync(coach, cancellationToken);
+            if (coach is null || service is null)
+                return Result.Failure<ServiceCoachResponse>(ServiceCoachErrors.CoachorServiceNotFound);
+
+            if (service.coaches.Any(c => c.CoachId == request.CoachId))
+                return Result.Failure<ServiceCoachResponse>(ServiceCoachErrors.AlreadyAssigned);
+           ServiceCoach serviceCoach= new ServiceCoach 
+           { CoachId = request.CoachId ,
+            ServiceId=request.ServiceId
+           };
+            await _context.ServiceCoaches.AddAsync(serviceCoach,cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            return Result.Success(coach.Adapt<CoachResponse>());
+            return Result.Success();
+        }
+
+        public async Task<Result> RemoveCoachFromServiceAsync(ServiceCoachRequest request, CancellationToken cancellationToken = default)
+        {
+            var service = await _context.Services.Include(s => s.coaches).FirstOrDefaultAsync(s => s.Id == request.ServiceId,cancellationToken);
+
+            if (service is null)
+                return Result.Failure<ServiceCoachResponse>(ServiceErrors.ServiceNotFound);
+
+            var coach =  service.coaches.FirstOrDefault(c => c.CoachId == request.CoachId);
+            if (coach is null)
+                return Result.Failure<ServiceCoachResponse>(ServiceCoachErrors.CoachNotAssigned);
+
+            service.coaches.Remove(coach);
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
         }
 
         //public async Task<IEnumerable<CoachResponse>> GetAllAsync(CancellationToken cancellationToken = default)

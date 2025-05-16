@@ -30,7 +30,7 @@ namespace Club_System_API.Controllers
             _stripeSettings = stripeOptions.Value;
         }
 
-        [Authorize(Roles = nameof(DefaultRoles.Admin))]
+       // [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] MembershipRequest request, CancellationToken cancellationToken)
         {
