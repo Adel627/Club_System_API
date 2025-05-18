@@ -1,16 +1,21 @@
-﻿using Stripe;
+﻿using Club_System_API.Helper;
+using Microsoft.Extensions.Options;
+using Stripe;
 using Stripe.Checkout;
 
 namespace Club_System_API.Services
 {
     public class StripeService : IStripeService
     {
-        public StripeService()
+        private readonly StripeSettings _stripeSettings;
+
+        public StripeService(IOptions<StripeSettings> stripeOptions)
         {
-            StripeConfiguration.ApiKey = "<Your Stripe Secret Key>";
+            _stripeSettings = stripeOptions.Value;
+            StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
         }
 
-        public async Task<Session> CreateCheckoutSession(decimal amount, string name, string successUrl, string cancelUrl)
+        public async Task<Session> CreateCheckoutSession(decimal amount, string name, string successUrl, string cancelUrl, Dictionary<string, string>? metadata = null)
         {
             var options = new SessionCreateOptions
             {
@@ -34,11 +39,11 @@ namespace Club_System_API.Services
                 Mode = "payment",
                 SuccessUrl = successUrl,
                 CancelUrl = cancelUrl,
+                Metadata = metadata
             };
 
             var service = new SessionService();
             return await service.CreateAsync(options);
         }
     }
-
 }

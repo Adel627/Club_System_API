@@ -59,6 +59,7 @@ namespace Club_System_API
             services.AddScoped<ICoachRatingService, CoachRatingService>();
             services.AddScoped<IQAService, QAService>();
            services.AddScoped<IServiceCoachService, ServiceCoachService>();
+            services.AddScoped<IBookingService, BookingService>();
 
             services.AddScoped<IUserService,Services.UserService>();
             services.AddScoped<IServiceReviewService, ServiceReviewService>();
