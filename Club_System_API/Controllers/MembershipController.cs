@@ -12,6 +12,7 @@ using Club_System_API.Dtos.Membership;
 using Club_System_API.Extensions;
 using Club_System_API.Helper;
 using Club_System_API.Services;
+using Club_System_API.Dtos.MembershipPayment;
 
 namespace Club_System_API.Controllers
 {
@@ -30,7 +31,7 @@ namespace Club_System_API.Controllers
             _stripeSettings = stripeOptions.Value;
         }
 
-       // [Authorize(Roles = nameof(DefaultRoles.Admin))]
+        // [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] MembershipRequest request, CancellationToken cancellationToken)
         {
@@ -55,11 +56,11 @@ namespace Club_System_API.Controllers
         }
         // Create Stripe Checkout Session to pay for selected membership.
         [Authorize]
-        [HttpPost("select")]
-        public async Task<IActionResult> SelectMembership([FromBody] MembershipRequest request)
+        [HttpPost("select /{id}")]
+        public async Task<IActionResult> SelectMembership([FromRoute] int MembershipId)
         {
             var domain = $"{Request.Scheme}://{Request.Host}";
-            var result = await _membershipService.CreateStripeCheckoutSessionAsync(User.GetUserId()!, request.MembershipId, domain);
+            var result = await _membershipService.CreateStripeCheckoutSessionAsync(User.GetUserId()!, MembershipId, domain);
 
             return result.IsSuccess
                 ? Ok(new { redirectUrl = result.Value })

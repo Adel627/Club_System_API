@@ -11,33 +11,13 @@ namespace Club_System_API.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<DateTime>(
-                name: "EndTime",
-                table: "Bookings",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+            
 
-            migrationBuilder.AddColumn<bool>(
-                name: "IsPaid",
-                table: "Bookings",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
+        
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "StartTime",
-                table: "Bookings",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+        
 
-            migrationBuilder.AddColumn<string>(
-                name: "Status",
-                table: "Bookings",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+        
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "MembershipEndDate",
@@ -57,23 +37,7 @@ namespace Club_System_API.Migrations
                 type: "datetime2",
                 nullable: true);
 
-            migrationBuilder.CreateTable(
-                name: "Memberships",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DurationInDays = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Memberships", x => x.Id);
-                });
-
+           
             migrationBuilder.CreateTable(
                 name: "MembershipPayments",
                 columns: table => new
@@ -103,34 +67,6 @@ namespace Club_System_API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "UserMemberships",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    MembershipId = table.Column<int>(type: "int", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserMemberships", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserMemberships_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserMemberships_Memberships_MembershipId",
-                        column: x => x.MembershipId,
-                        principalTable: "Memberships",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
@@ -153,15 +89,6 @@ namespace Club_System_API.Migrations
                 table: "MembershipPayments",
                 column: "UserId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_UserMemberships_ApplicationUserId",
-                table: "UserMemberships",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserMemberships_MembershipId",
-                table: "UserMemberships",
-                column: "MembershipId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUsers_Memberships_MembershipId",

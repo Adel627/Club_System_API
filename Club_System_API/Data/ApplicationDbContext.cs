@@ -4,10 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) :
-    IdentityDbContext<ApplicationUser>(options)
+public class ApplicationDbContext :
+    IdentityDbContext<ApplicationUser>
 {
-
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)   
+    {
+        
+    }
     public DbSet<Service> Services { get; set; }
     public DbSet<Coach> Coachs { get; set; }
     public DbSet<ServiceCoach> ServiceCoaches { get; set; }

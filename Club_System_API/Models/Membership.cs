@@ -16,6 +16,7 @@
         public decimal Price { get; set; }
         public int DurationInDays { get; set; }
         public bool IsActive { get; set; } = true;
+        public byte[]? Image { get; set; }
 
         public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
     }

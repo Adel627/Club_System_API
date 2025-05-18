@@ -96,7 +96,7 @@ namespace Club_System_API.Services
 
             var options = new SessionCreateOptions
             {
-                CustomerEmail = (await _userManager.FindByIdAsync(userId))?.Email,
+                CustomerEmail = (await _userManager.FindByIdAsync(userId))?.PhoneNumber,
                 LineItems = new List<SessionLineItemOptions>
             {
                 new()
@@ -107,6 +107,7 @@ namespace Club_System_API.Services
                         UnitAmountDecimal = membership.Price * 100,
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
+                            Images=[membership.Image?.ToString()],
                             Name = membership.Name,
                             Description = membership.Description
                         }
