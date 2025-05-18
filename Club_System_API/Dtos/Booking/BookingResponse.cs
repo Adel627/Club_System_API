@@ -2,12 +2,13 @@
 {
     public class BookingResponse
     {
-        public int Id { get; set; }
-        public string ServiceName { get; set; } = string.Empty;
-        public string? CoachName { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public string Status { get; set; } = "Pending";
-        public bool IsPaid { get; set; }
-    }
+            public int Id { get; set; }
+            public string UserName { get; set; } = default!;
+            public string ServiceName { get; set; } = default!;
+            public string CoachName { get; set; } = default!;
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
+            public string Status { get; set; } = default!;
+            public bool IsPaid { get; set; }
+    } 
 }
