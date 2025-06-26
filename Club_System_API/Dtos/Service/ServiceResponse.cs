@@ -7,7 +7,8 @@ namespace Club_System_API.Dtos.Service
          int Id ,
          string Name ,
          decimal Price, 
-        string Description ,
+        string Description,
+        double AverageRating,
         byte[]? Image
     );
 }

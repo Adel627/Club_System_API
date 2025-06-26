@@ -78,13 +78,11 @@ public class UserService(UserManager<ApplicationUser> userManager,
                         u.LastName,
                         u.Birth_Of_Date,
                         u.MembershipId,
-                        u.MembershipStartDate,
-                        u.MembershipEndDate,
                         u.Image,
                         u.IsDisabled,
                         RoleName = r != null ? r.Name : null
                     })
-                    .GroupBy(u => new { u.Id,u.PhoneNumber, u.FirstName, u.LastName, u.MembershipNumber, u.Birth_Of_Date, u.Image, u.MembershipId,u.MembershipStartDate,u.MembershipEndDate,  u.IsDisabled })
+                    .GroupBy(u => new { u.Id,u.PhoneNumber, u.FirstName, u.LastName, u.MembershipNumber, u.Birth_Of_Date, u.Image, u.MembershipId,  u.IsDisabled })
                     .Select(u => new UserResponse
                     (
                         u.Key.Id,
@@ -95,8 +93,6 @@ public class UserService(UserManager<ApplicationUser> userManager,
                         u.Key.Birth_Of_Date,
                         u.Key.Image,
                         u.Key.MembershipId,
-                        u.Key.MembershipStartDate,
-                        u.Key.MembershipEndDate,
                         u.Key.IsDisabled,
                         u.Where(x => x.RoleName != null).Select(x => x.RoleName).Distinct().ToList() // Ensure distinct roles
                     ))

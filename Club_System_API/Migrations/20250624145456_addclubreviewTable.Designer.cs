@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Club_System_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250624145456_addclubreviewTable")]
+    partial class addclubreviewTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,11 +69,17 @@ namespace Club_System_API.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTime?>("MembershipEndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("MembershipId")
                         .HasColumnType("int");
 
                     b.Property<string>("MembershipNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("MembershipStartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -123,7 +132,7 @@ namespace Club_System_API.Migrations
                             EmailConfirmed = false,
                             FirstName = "Club System",
                             IsDisabled = false,
-                            JoinedAt = new DateOnly(2025, 6, 26),
+                            JoinedAt = new DateOnly(2025, 6, 24),
                             LastName = "Admin",
                             LockoutEnabled = false,
                             MembershipNumber = "Admin7",

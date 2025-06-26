@@ -14,6 +14,7 @@ namespace Club_System_API.Services
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        
         public MembershipService(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _context = context;
@@ -96,7 +97,8 @@ namespace Club_System_API.Services
 
             var options = new SessionCreateOptions
             {
-                CustomerEmail = (await _userManager.FindByIdAsync(userId))?.PhoneNumber,
+                ClientReferenceId = userId,
+
                 LineItems = new List<SessionLineItemOptions>
             {
                 new()
@@ -107,9 +109,12 @@ namespace Club_System_API.Services
                         UnitAmountDecimal = membership.Price * 100,
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-                            Images=[membership.Image?.ToString()],
+                            Images = string.IsNullOrWhiteSpace(membership.Image?.ToString())
+                                ? null
+                                : new List<string> { membership.Image.ToString() },
                             Name = membership.Name,
-                            Description = membership.Description
+                            Description = membership.Description,
+                            
                         }
                     },
                     Quantity = 1
@@ -123,33 +128,63 @@ namespace Club_System_API.Services
             var service = new SessionService();
             var session = await service.CreateAsync(options);
 
+            var purchase = new MembershipPayment
+            {
+                UserId = userId,
+                MembershipId = membership.Id,
+                StripeSessionId = session.Id,
+                IsPaid = false
+            };
+            _context.MembershipPayments.Add(purchase);
+            await _context.SaveChangesAsync();
+
             return Result.Success(session.Url);
         }
 
-        public async Task<Result> AssignMembershipAfterPaymentAsync(string sessionId)
+        public async Task<Result> VerifyStripePaymentAsync(string sessionId)
         {
-            var service = new SessionService();
-            var session = await service.GetAsync(sessionId);
+            var sessionService = new SessionService();
+            var session = await sessionService.GetAsync(sessionId);
 
-            if (session.PaymentStatus != "paid") return Result.Failure(MembershipErrors.MembershipNotFound);
+            if (session.PaymentStatus != "paid")
+                return Result.Failure(PaymentErrors.PaymentNotComplete);
 
-            var user = await _userManager.Users
-                .FirstOrDefaultAsync(u => u.Email == session.CustomerEmail);
+            var userId = session.ClientReferenceId;
 
-            if (user == null) return Result.Failure(UserErrors.UserNotFound);
+            // 1. تأكد إن الدفع موجود في قاعدة البيانات
+            var payment = await _context.MembershipPayments
+                .FirstOrDefaultAsync(p => p.StripeSessionId == sessionId && p.UserId == userId);
 
+            if (payment == null)
+                return Result.Failure(PaymentErrors.PaymentNotFound);
+
+            if (payment.IsPaid)
+                return Result.Success("✅ Payment already verified.");
+
+            // 2. حدث حالة الدفع
+            payment.IsPaid = true;
+
+            var purchase = await _context.MembershipPayments.FirstOrDefaultAsync(p => p.StripeSessionId == session.Id);
             var membership = await _context.Memberships
-                .FirstOrDefaultAsync(m => session.LineItems.Any(li => li.Description == m.Description));
+                .SingleOrDefaultAsync(m=> m.Id== purchase.MembershipId);
 
-            if (membership == null) return Result.Failure(MembershipErrors.MembershipNotFound);
 
-            user.MembershipId = membership.Id;
-            user.MembershipStartDate = DateTime.UtcNow;
-            user.MembershipEndDate = DateTime.UtcNow.AddDays(membership.DurationInDays);
+            // Optionally assign membership here
+            _context.UserMemberships.Add(new UserMembership
+            {
+                ApplicationUserId = purchase.UserId,
+                MembershipId = purchase.MembershipId,
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(membership.DurationInDays)
+            });
 
             await _context.SaveChangesAsync();
-            return Result.Success();
+
+            return Result.Success("✅ Payment verified and membership assigned.");
         }
+
+
+
     }
 
 }

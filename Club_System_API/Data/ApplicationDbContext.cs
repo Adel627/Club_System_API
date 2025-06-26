@@ -16,9 +16,10 @@ public class ApplicationDbContext :
     public DbSet<ServiceCoach> ServiceCoaches { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Booking> Bookings { get; set; }
-    public DbSet<CoachRating> CoachRatings { get; set; }
+    public DbSet<CoachReview> CoachReviews { get; set; }
     public DbSet<QA> QAs { get; set; }
     public DbSet<ServiceReview> ServiceReviews { get; set; }
+    public DbSet<ClubReview> clubReviews { get; set; }  
 
     public DbSet<Membership> Memberships { get; set; }
     public DbSet<MembershipPayment> MembershipPayments { get; set; }

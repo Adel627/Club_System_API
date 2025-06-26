@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Club_System_API.Data.ModelsConfigurations
 {
-    public class CoachRatingConfiguration : IEntityTypeConfiguration<CoachRating>
+    public class CoachReviewConfiguration : IEntityTypeConfiguration<CoachReview>
     {
-        public void Configure(EntityTypeBuilder<CoachRating> builder)
+        public void Configure(EntityTypeBuilder<CoachReview> builder)
         {
             builder.HasKey(cu => new { cu.CoachId, cu.UserId });
            

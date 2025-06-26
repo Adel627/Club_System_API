@@ -15,7 +15,7 @@
         public byte[]? Image { get; set; }
         public double AverageRating {  get; set; }
         public ICollection<ServiceCoach> Services { get; set; } = default!;
-        public ICollection<CoachRating> Rating { get; set; }= default!;
+        public ICollection<CoachReview> Rating { get; set; }= default!;
 
     }
 }

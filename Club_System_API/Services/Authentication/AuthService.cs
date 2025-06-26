@@ -86,7 +86,7 @@ namespace Club_System_API.Services.Authentication
                 await _userManager.UpdateAsync(user);
 
                 var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName,user.Birth_Of_Date,user.Image,user.PhoneNumber,
-                    user.MembershipId,user.MembershipStartDate,user.MembershipEndDate, token, expiresIn, refreshToken, refreshTokenExpiration);
+                    user.MembershipId, token, expiresIn, refreshToken, refreshTokenExpiration);
 
                 return Result.Success(response);
             }
@@ -139,7 +139,7 @@ namespace Club_System_API.Services.Authentication
 
             await _userManager.UpdateAsync(user);
 
-            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date, user.Image, user.PhoneNumber,user.MembershipId,user.MembershipStartDate,user.MembershipEndDate,
+            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date, user.Image, user.PhoneNumber,user.MembershipId,
                 newToken, expiresIn, newRefreshToken, refreshTokenExpiration);
 
             return Result.Success(response);

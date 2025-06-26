@@ -16,9 +16,9 @@ namespace Club_System_API.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly StripeSettings _stripeSettings;
-        private readonly StripeService _stripeService;
+        private readonly IStripeService _stripeService;
 
-        public BookingService(ApplicationDbContext context, IOptions<StripeSettings> stripeOptions, StripeService stripeService)
+        public BookingService(ApplicationDbContext context, IOptions<StripeSettings> stripeOptions, IStripeService stripeService)
         {
             _context = context;
             _stripeSettings = stripeOptions.Value;

@@ -15,6 +15,11 @@ namespace Club_System_API.Services
         public async Task<Result<ServiceReviewResponse>> AddAsync(string userid, ServiceReviewRequest request, CancellationToken cancellationToken = default)
         {
 
+
+            if (request.Rating > 5)
+                return Result.Failure<ServiceReviewResponse>(ServiceReviewErrors.InvalidRate);
+
+
             var service = await _context.Services
                .SingleOrDefaultAsync(x => x.Id == request.ServiceId);
             if (service is null)
@@ -40,6 +45,10 @@ namespace Club_System_API.Services
 
         public async Task<Result> UpdateAsync(string userid, ServiceReviewRequest request, CancellationToken cancellationToken = default)
         {
+
+            if (request.Rating > 5)
+                return Result.Failure<ServiceReviewResponse>(ServiceReviewErrors.InvalidRate);
+
             var service = await _context.Services
               .SingleOrDefaultAsync(x => x.Id == request.ServiceId);
             if (service is null)
@@ -73,9 +82,11 @@ namespace Club_System_API.Services
                 .Where(r => r.ServiceId == serviceid)
                 .Select(r => new ServiceReviewWithUserImageResponse(
                     r.User.Image,
-                    r.Review,
+                    r.User.FirstName,
+                    r.User.LastName,
+                    r.ReviewAt,
                     r.Rating,
-                    r.ReviewAt
+                    r.Review
                 ))
                 .ToListAsync(cancellationToken);
 

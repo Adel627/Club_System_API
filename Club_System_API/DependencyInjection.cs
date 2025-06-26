@@ -56,16 +56,18 @@ namespace Club_System_API
             services.AddScoped<IAuthService, AuthService>();                       
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<ICoachService, CoachService>();
-            services.AddScoped<ICoachRatingService, CoachRatingService>();
+            services.AddScoped<ICoachReviewService, CoachReviewService>();
             services.AddScoped<IQAService, QAService>();
            services.AddScoped<IServiceCoachService, ServiceCoachService>();
-            services.AddScoped<IBookingService, BookingService>();
 
             services.AddScoped<IUserService,Services.UserService>();
             services.AddScoped<IServiceReviewService, ServiceReviewService>();
+            services.AddScoped<IClubReviewService,ClubReviewService>(); 
             services.AddScoped<IMembershipService, MembershipService>();
             services.AddScoped<IMembershipPaymentService,MembershipPaymentService>();
             services.AddScoped<IStripeService, StripeService>();
+            services.AddScoped<IBookingService, BookingService>();
+
 
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();

@@ -11,8 +11,6 @@ namespace Club_System_API.Dtos.Authentication
         byte[]? Image,
         string PhoneNumber,
         int? MembershipId ,
-        DateTime? MembershipStartDate ,
-        DateTime? MembershipEndDate,
         string Token,
         int ExpiresIn,
         string RefreshToken,

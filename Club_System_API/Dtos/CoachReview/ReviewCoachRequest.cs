@@ -2,8 +2,11 @@
 
 namespace Club_System_API.Dtos.CoachRating
 {
-    public record RateCoachRequest(
+    public record ReviewCoachRequest(
           int CoachId ,
-          int Rating 
+          string Review,
+          int Rating
+         
+      
         );
 }

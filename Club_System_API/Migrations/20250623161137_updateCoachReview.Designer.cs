@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Club_System_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250623161137_updateCoachReview")]
+    partial class updateCoachReview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,11 +69,17 @@ namespace Club_System_API.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTime?>("MembershipEndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("MembershipId")
                         .HasColumnType("int");
 
                     b.Property<string>("MembershipNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("MembershipStartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -123,7 +132,7 @@ namespace Club_System_API.Migrations
                             EmailConfirmed = false,
                             FirstName = "Club System",
                             IsDisabled = false,
-                            JoinedAt = new DateOnly(2025, 6, 26),
+                            JoinedAt = new DateOnly(2025, 6, 23),
                             LastName = "Admin",
                             LockoutEnabled = false,
                             MembershipNumber = "Admin7",
@@ -227,36 +236,6 @@ namespace Club_System_API.Migrations
                     b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("Club_System_API.Models.ClubReview", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Review")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ReviewAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("clubReviews");
-                });
-
             modelBuilder.Entity("Club_System_API.Models.Coach", b =>
                 {
                     b.Property<int>("Id")
@@ -322,15 +301,15 @@ namespace Club_System_API.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime>("RatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
                     b.Property<string>("Review")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ReviewAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("CoachId", "UserId");
 
@@ -798,17 +777,6 @@ namespace Club_System_API.Migrations
                     b.Navigation("Coach");
 
                     b.Navigation("Service");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Club_System_API.Models.ClubReview", b =>
-                {
-                    b.HasOne("Club_System_API.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("User");
                 });

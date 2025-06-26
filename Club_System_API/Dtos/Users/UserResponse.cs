@@ -9,8 +9,6 @@ public record UserResponse(
     DateOnly Birth_Of_Date,
     byte[]? Image,
     int? MembershipId,
-    DateTime? MembershipStartDate,
-    DateTime? MembershipEndDate,
     bool IsDisabled,
     IEnumerable<string> Roles
 );

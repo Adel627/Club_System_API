@@ -18,6 +18,13 @@ namespace Club_System_API.Services
 
         public async Task<Result<QAResponse>> AddAsync(string userid, QARequest Request, CancellationToken cancellationToken = default)
         {
+            string Question = "";
+            if (!Request.Question.EndsWith("?"))
+            
+                Question = Request.Question + "?";
+            else
+            Question = Request.Question;
+
             var sortnum = GetSortNum();
             foreach (var x in sortnum) 
             {
@@ -25,6 +32,7 @@ namespace Club_System_API.Services
                  return   Result.Failure<QAResponse>(QAErrors.DuplicatedSortNum);
             }
             var qa = Request.Adapt<QA>();
+            qa.Question = Question;
             qa.UserId = userid;
             await _context.AddAsync(qa, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
@@ -33,21 +41,21 @@ namespace Club_System_API.Services
 
 
 
-        public async Task<IEnumerable<QAResponse>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<GetQAResponse>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await _context.QAs.OrderBy(x=>x.SortNum)
            .AsNoTracking()
-           .ProjectToType<QAResponse>()
+           .ProjectToType<GetQAResponse>()
            .ToListAsync(cancellationToken);
         }
 
-        public async Task<Result<QAResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Result<GetQAResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
         {
             var qa = await _context.QAs.FindAsync(id, cancellationToken);
 
             return qa is not null
-                ? Result.Success(qa.Adapt<QAResponse>())
-                : Result.Failure<QAResponse>(QAErrors.QANotFound);
+                ? Result.Success(qa.Adapt<GetQAResponse>())
+                : Result.Failure<GetQAResponse>(QAErrors.QANotFound);
         }
 
         public async Task<Result> UpdateAsync(int id, QARequest request, CancellationToken cancellationToken = default)
@@ -64,7 +72,13 @@ namespace Club_System_API.Services
                 if (request.SortNum == x)
                   return  Result.Failure<QAResponse>(QAErrors.DuplicatedSortNum);
             }
-            currentQA.Question = request.Question;
+            string Question = "";
+            if (!request.Question.EndsWith("?"))
+
+                Question = request.Question + "?";
+            else
+                Question = request.Question;
+            currentQA.Question = Question;
             currentQA.Answer = request.Answer;
             currentQA.SortNum = request.SortNum;
             await _context.SaveChangesAsync(cancellationToken);

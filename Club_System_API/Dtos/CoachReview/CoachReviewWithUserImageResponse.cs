@@ -1,13 +1,11 @@
-﻿namespace Club_System_API.Dtos.ServiceReview
+﻿namespace Club_System_API.Dtos.CoachReview
 {
-    public record ServiceReviewWithUserImageResponse
-   (
+    public record CoachReviewWithUserImageResponse(
           byte[]? Image,
           string FirstName,
           string LastName,
           DateTime ReviewAt,
           int Rating,
           string Review
-
         );
 }
