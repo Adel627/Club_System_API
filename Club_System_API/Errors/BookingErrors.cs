@@ -7,7 +7,11 @@
             public static readonly Error BookingNotFound =
                 new("Booking.NotFound", "The booking was not found.", StatusCodes.Status404NotFound);
 
-            public static readonly Error AppointmentNotFound =
+        public static readonly Error BookingPayedBefore =
+               new("Booking.PayedBefore", "The booking was Payed.", StatusCodes.Status409Conflict);
+
+
+        public static readonly Error AppointmentNotFound =
                 new("Booking.AppointmentNotFound", "The selected appointment does not exist.", StatusCodes.Status404NotFound);
 
             public static readonly Error AppointmentFull =

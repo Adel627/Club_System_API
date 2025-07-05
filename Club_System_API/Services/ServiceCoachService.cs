@@ -19,7 +19,9 @@ namespace Club_System_API.Services
 
             if (coach is null || service is null)
                 return Result.Failure<ServiceCoachResponse>(ServiceCoachErrors.CoachorServiceNotFound);
-
+         
+            if (coach.IsDisabled)
+                return Result.Failure<ServiceCoachResponse>(CoachErrors.CoachNotFound);
             if (service.coaches.Any(c => c.CoachId == request.CoachId))
                 return Result.Failure<ServiceCoachResponse>(ServiceCoachErrors.AlreadyAssigned);
            ServiceCoach serviceCoach= new ServiceCoach 

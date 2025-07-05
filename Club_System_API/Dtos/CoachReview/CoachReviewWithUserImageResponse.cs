@@ -1,7 +1,8 @@
 ﻿namespace Club_System_API.Dtos.CoachReview
 {
     public record CoachReviewWithUserImageResponse(
-          byte[]? Image,
+         string? ContentType,
+        string? Base64Data,
           string FirstName,
           string LastName,
           DateTime ReviewAt,

@@ -17,6 +17,10 @@ namespace Club_System_API.Services
         private readonly ApplicationDbContext _context=context;
         public async Task<Result<ReviewCoachResponse>> AddAsync(string userid, ReviewCoachRequest request, CancellationToken cancellationToken = default)
         {
+            if (!await _context.Bookings.Include(x => x.Appointment)
+                .Where(x => x.UserId == userid)
+                .AnyAsync(x => x.Appointment.CoachId == request.CoachId))
+                return Result.Failure<ReviewCoachResponse>(CoachReviewErrors.NotAllowedTOReview);
             if (request.Rating > 5)
                 return Result.Failure<ReviewCoachResponse>(CoachErrors.InvalidRate);
 
@@ -46,6 +50,10 @@ namespace Club_System_API.Services
 
         public async Task<Result> UpdateAsync(string userid,ReviewCoachRequest request, CancellationToken cancellationToken = default)
         {
+            if (!await _context.Bookings.Include(x => x.Appointment)
+                .Where(x => x.UserId == userid)
+                .AnyAsync(x => x.Appointment.CoachId == request.CoachId))
+                return Result.Failure<ReviewCoachResponse>(CoachReviewErrors.NotAllowedTOReview);
 
 
             if (request.Rating > 5)
@@ -84,7 +92,8 @@ namespace Club_System_API.Services
                 .Include(r => r.User)
                 .Where(r => r.CoachId == coachid)
                 .Select(r => new CoachReviewWithUserImageResponse(
-                    r.User.Image,
+                    r.User.ImageContentType,
+                    $"data:{r.User.ImageContentType};base64,{Convert.ToBase64String(r.User.Image)}",
                     r.User.FirstName,
                     r.User.LastName,
                     r.ReviewAt,

@@ -52,7 +52,9 @@ namespace Club_System_API.Services
             var reviews = await _context.clubReviews
                 .Include(r => r.User)
                 .Select(r => new ClubReviewWithUserImageResponse(
-                    r.User.Image,
+                    r.User.ImageContentType,
+                    $"data:{r.User.ImageContentType};base64,{Convert.ToBase64String(r.User.Image)}",
+
                     r.User.FirstName,
                     r.User.LastName,
                     r.ReviewAt,

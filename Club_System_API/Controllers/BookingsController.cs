@@ -1,4 +1,5 @@
 ﻿using Club_System_API.Abstractions;
+using Club_System_API.Abstractions.Consts;
 using Club_System_API.Dtos.Booking;
 using Club_System_API.Extensions;
 using Club_System_API.Services;
@@ -11,37 +12,22 @@ namespace Club_System_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = nameof(DefaultRoles.Member))]
+
     public class BookingsController(IBookingService bookingService) : ControllerBase
     {
         private readonly IBookingService _bookingService = bookingService;
 
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> Book([FromBody] BookingRequest request)
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
+        [HttpPost("{appointmentid}")]
+        public async Task<IActionResult> Book([FromRoute] int appointmentid)
         {
             var userId = User.GetUserId();
-            var result = await _bookingService.BookAsync(userId, request);
+            var result = await _bookingService.BookAsync(userId, appointmentid);
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
-        [Authorize]
-        [HttpGet("my")]
-        public async Task<IActionResult> GetMyBookings()
-        {
-            var userId = User.GetUserId();
-            var result = await _bookingService.GetMyBookingsAsync(userId);
-            return Ok(result.Value);
-        }
-
-        [Authorize]
-        [HttpPost("cancel/{bookingId}")]
-        public async Task<IActionResult> Cancel(int bookingId)
-        {
-            var userId = User.GetUserId();
-            var result = await _bookingService.CancelAsync(userId, bookingId);
-            return result.IsSuccess ? Ok() : result.ToProblem();
-        }
-        [Authorize]
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
         [HttpPost("pay/{bookingId}")]
         public async Task<IActionResult> StartPayment(int bookingId)
         {
@@ -50,22 +36,35 @@ namespace Club_System_API.Controllers
             return result.IsSuccess ? Ok(new { redirectUrl = result.Value.StripeCheckoutUrl }) : result.ToProblem();
         }
 
-        [HttpPost("webhook")]
-        public async Task<IActionResult> StripeWebhook()
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
+        [HttpGet("verify")]
+        public async Task<IActionResult> Verify([FromQuery] string session_id)
         {
-            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-            var stripeSignature = Request.Headers["Stripe-Signature"];
+            var result = await _bookingService.VerifyStripePaymentAsync(session_id);
+            if (result.IsSuccess)
+                return Ok(result.IsSuccess);
 
-            try
-            {
-                await _bookingService.HandleStripeWebhookAsync(json, stripeSignature!);
-                return Ok();
-            }
-            catch (StripeException ex)
-            {
-                return BadRequest(new { message = $"Stripe webhook error: {ex.Message}" });
-            }
+            return BadRequest(result.ToProblem());
         }
+
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyBookings()
+        {
+            var userId = User.GetUserId();
+            var result = await _bookingService.GetMyBookingsAsync(userId);
+            return Ok(result.Value);
+        }
+
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
+        [HttpPost("cancel/{bookingId}")]
+        public async Task<IActionResult> Cancel([FromRoute]int bookingId)
+        {
+            var userId = User.GetUserId();
+            var result = await _bookingService.CancelAsync(userId, bookingId);
+            return result.IsSuccess ? Ok() : result.ToProblem();
+        }
+       
     }
 }
 

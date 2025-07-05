@@ -2,7 +2,8 @@
 {
     public record ServiceReviewWithUserImageResponse
    (
-          byte[]? Image,
+          string? ContentType,
+        string? Base64Data,
           string FirstName,
           string LastName,
           DateTime ReviewAt,

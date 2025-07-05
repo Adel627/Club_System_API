@@ -7,5 +7,8 @@
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public int DurationInDays { get; set; }
+        public string? ContentType {  get; set; }
+        public string? Base64Data {  get; set; }
+         public DateTime? CreatedAt { get; set; }
     }
 }

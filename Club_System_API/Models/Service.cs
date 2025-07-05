@@ -9,6 +9,8 @@
         public double AverageRating { get; set; }
 
         public byte[]? Image {  get; set; }
+        public string? ImageContentType { get; set; }
+
         public DateOnly CreatedAt { get; set; }=DateOnly.FromDateTime(DateTime.Now);
 
         public ICollection<ServiceCoach> coaches { get; set; } = default!;

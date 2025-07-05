@@ -9,11 +9,7 @@ namespace Club_System_API.Data.ModelsConfigurations
     {
         public void Configure(EntityTypeBuilder<Booking> builder)
         {
-            builder
-             .HasOne(b => b.Coach)
-             .WithMany()
-             .HasForeignKey(b => b.CoachId)
-             .OnDelete(DeleteBehavior.Restrict);
+          
 
             builder
               .HasOne(b => b.User)

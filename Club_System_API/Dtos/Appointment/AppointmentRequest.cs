@@ -4,8 +4,10 @@
       int CoachId,
       int ServiceId,  
       DayOfWeek Day , 
-      TimeOnly? Time  ,
-      int MaxAttenderNum,
-      int Id
+      TimeOnly Time ,
+    int? Duration,
+
+      int MaxAttenderNum
+     
     );
 }

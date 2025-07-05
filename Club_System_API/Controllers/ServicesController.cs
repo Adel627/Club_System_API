@@ -22,7 +22,7 @@ namespace Club_System_API.Controllers
 
         [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpPost]
-        public async Task<IActionResult> Add( ServiceRequest request,
+        public async Task<IActionResult> Add( [FromForm]ServiceRequest request,
        CancellationToken cancellationToken)
         {
             var result = await _serviceService.AddAsync(request, cancellationToken);
@@ -49,7 +49,7 @@ namespace Club_System_API.Controllers
 
         [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] ServiceRequest request,
+        public async Task<IActionResult> Update([FromRoute] int id, [FromForm] ServiceRequest request,
         CancellationToken cancellationToken)
         {
             var result = await _serviceService.UpdateAsync(id, request, cancellationToken);

@@ -61,6 +61,7 @@ namespace Club_System_API.Services
             currentCoach.PhoneNumber = request.PhoneNumber;
             currentCoach.Salary = request.Salary;
             currentCoach.Image=FormFileExtensions.ConvertToBytes(request.Image);
+            currentCoach.ImageContentType=request.Image.ContentType;
 
             await _context.SaveChangesAsync(cancellationToken);
 

@@ -9,6 +9,7 @@ namespace Club_System_API.Dtos.Service
          decimal Price, 
         string Description,
         double AverageRating,
-        byte[]? Image
+        string? ContentType,
+        string? Base64Data
     );
 }

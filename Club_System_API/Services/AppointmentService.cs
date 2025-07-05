@@ -7,6 +7,7 @@ using Club_System_API.Models;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace Club_System_API.Services
 {
@@ -33,62 +34,69 @@ namespace Club_System_API.Services
             return Result.Success(appointment.Adapt<AppointmentResponse>());
         }
 
+        public async Task<IEnumerable<AppointmentOfServiceResponse>> GetAllOfServiceAsync(int serviceid,CancellationToken cancellationToken = default)
+        {
+            return await _context.Appointments.Where(x => x.ServiceId == serviceid)
+                .AsNoTracking()
+           .ProjectToType<AppointmentOfServiceResponse>()
+           .ToListAsync(cancellationToken);
+        }
 
+        public async Task<IEnumerable<AppointmentOfServiceResponse>> GetAllOfCoachAsync(int coachid, CancellationToken cancellationToken = default)
+        {
+            return await _context.Appointments.Where(x => x.CoachId == coachid)
+                            .AsNoTracking()
+                       .ProjectToType<AppointmentOfServiceResponse>()
+                       .ToListAsync(cancellationToken);
+        }
+      
+        public async Task<IEnumerable<AppointmentOfServiceResponse>> GetAllAsync( CancellationToken cancellationToken = default)
+        {
+            return await _context.Appointments
+                .AsNoTracking()
+           .ProjectToType<AppointmentOfServiceResponse>()
+           .ToListAsync(cancellationToken);
+        }
+        public async Task<Result<AppointmentResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var appointment = await _context.Appointments.FindAsync(id, cancellationToken);
 
-        //public async Task<IEnumerable<AppointmentResponse>> GetAllAsync(CancellationToken cancellationToken = default)
-        //{
-        //    return await _context.QAs.OrderBy(x => x.SortNum)
-        //   .AsNoTracking()
-        //   .ProjectToType<AppointmentResponse>()
-        //   .ToListAsync(cancellationToken);
-        //}
+            return appointment is not null
+                ? Result.Success(appointment.Adapt<AppointmentResponse>())
+                : Result.Failure<AppointmentResponse>(AppointmentErrors.AppointmentNotFound);
+        }
 
-        //public async Task<Result<AppointmentResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
-        //{
-        //    var qa = await _context.QAs.FindAsync(id, cancellationToken);
+        public async Task<Result> UpdateAsync(int id, AppointmentUpdateRequest request, CancellationToken cancellationToken = default)
+        {
 
-        //    return qa is not null
-        //        ? Result.Success(qa.Adapt<AppointmentResponse>())
-        //        : Result.Failure<AppointmentResponse>(QAErrors.QANotFound);
-        //}
+            var currentAppointment = await _context.Appointments.FindAsync(id, cancellationToken);
 
-        //public async Task<Result> UpdateAsync(int id, QARequest request, CancellationToken cancellationToken = default)
-        //{
+            if (currentAppointment is null)
+                return Result.Failure(AppointmentErrors.AppointmentNotFound);
 
-        //    var currentQA = await _context.QAs.FindAsync(id, cancellationToken);
+           
+            currentAppointment.Day = request.Day;
+            currentAppointment.Time = request.Time;
+            currentAppointment.MaxAttenderNum = request.MaxAttenderNum;
+            await _context.SaveChangesAsync(cancellationToken);
 
-        //    if (currentQA is null)
-        //        return Result.Failure(QAErrors.QANotFound);
+            return Result.Success();
+        }
+        public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
 
-        //    var sortnum = GetSortNum();
-        //    foreach (var x in sortnum)
-        //    {
-        //        if (request.SortNum == x)
-        //            return Result.Failure<AppointmentResponse>(QAErrors.DuplicatedSortNum);
-        //    }
-        //    currentQA.Question = request.Question;
-        //    currentQA.Answer = request.Answer;
-        //    currentQA.SortNum = request.SortNum;
-        //    await _context.SaveChangesAsync(cancellationToken);
+            if (appointment is null)
+                return Result.Failure(AppointmentErrors.AppointmentNotFound);
 
-        //    return Result.Success();
-        //}
-        //public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default)
-        //{
-        //    var Service = await _context.QAs.FindAsync(id);
+            _context.Remove(appointment);
 
-        //    if (Service is null)
-        //        return Result.Failure(QAErrors.QANotFound);
+            await _context.SaveChangesAsync(cancellationToken);
 
-        //    _context.Remove(Service);
+            return Result.Success();
+        }
 
-        //    await _context.SaveChangesAsync(cancellationToken);
-
-        //    return Result.Success();
-        //}
-
-
-        
+       
     }
 
 

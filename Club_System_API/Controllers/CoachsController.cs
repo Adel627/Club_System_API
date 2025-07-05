@@ -24,7 +24,7 @@ namespace Club_System_API.Controllers
 
         [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpPost]
-        public async Task<IActionResult> Add( CoachRequest request,
+        public async Task<IActionResult> Add( [FromForm]CoachRequest request,
         CancellationToken cancellationToken)
         {
             var result = await _coachService.AddAsync(request, cancellationToken);

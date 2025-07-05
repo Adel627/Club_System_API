@@ -85,8 +85,8 @@ namespace Club_System_API.Services.Authentication
 
                 await _userManager.UpdateAsync(user);
 
-                var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName,user.Birth_Of_Date,user.Image,user.PhoneNumber,
-                    user.MembershipId, token, expiresIn, refreshToken, refreshTokenExpiration);
+                var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName,user.Birth_Of_Date,user.ImageContentType,string.IsNullOrEmpty( user?.Image?.ToString())?null:$"data:{user.ImageContentType};base64,{Convert.ToBase64String(user?.Image)}", user?.PhoneNumber!,
+                    user?.MembershipId, token, expiresIn, refreshToken, refreshTokenExpiration);
 
                 return Result.Success(response);
             }
@@ -139,7 +139,8 @@ namespace Club_System_API.Services.Authentication
 
             await _userManager.UpdateAsync(user);
 
-            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date, user.Image, user.PhoneNumber,user.MembershipId,
+                       
+            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date,user.ImageContentType, $"data:{user.ImageContentType};base64,{Convert.ToBase64String(user.Image)}", user.PhoneNumber,user.MembershipId,
                 newToken, expiresIn, newRefreshToken, refreshTokenExpiration);
 
             return Result.Success(response);

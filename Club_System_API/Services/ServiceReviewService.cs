@@ -15,6 +15,11 @@ namespace Club_System_API.Services
         public async Task<Result<ServiceReviewResponse>> AddAsync(string userid, ServiceReviewRequest request, CancellationToken cancellationToken = default)
         {
 
+            if (!await _context.Bookings.Include(x => x.Appointment)
+                .Where(x => x.UserId == userid)
+                .AnyAsync(x => x.Appointment.CoachId == request.ServiceId))
+                return Result.Failure<ServiceReviewResponse>(ServiceReviewErrors.NotAllowedTOReview);
+
 
             if (request.Rating > 5)
                 return Result.Failure<ServiceReviewResponse>(ServiceReviewErrors.InvalidRate);
@@ -45,6 +50,12 @@ namespace Club_System_API.Services
 
         public async Task<Result> UpdateAsync(string userid, ServiceReviewRequest request, CancellationToken cancellationToken = default)
         {
+
+            if (!await _context.Bookings.Include(x => x.Appointment)
+              .Where(x => x.UserId == userid)
+              .AnyAsync(x => x.Appointment.CoachId == request.ServiceId))
+                return Result.Failure<ServiceReviewResponse>(ServiceReviewErrors.NotAllowedTOReview);
+
 
             if (request.Rating > 5)
                 return Result.Failure<ServiceReviewResponse>(ServiceReviewErrors.InvalidRate);
@@ -81,7 +92,8 @@ namespace Club_System_API.Services
                 .Include(r => r.User)
                 .Where(r => r.ServiceId == serviceid)
                 .Select(r => new ServiceReviewWithUserImageResponse(
-                    r.User.Image,
+                    r.User.ImageContentType,
+                    $"data:{r.User.ImageContentType};base64,{Convert.ToBase64String(r.User.Image)}",
                     r.User.FirstName,
                     r.User.LastName,
                     r.ReviewAt,

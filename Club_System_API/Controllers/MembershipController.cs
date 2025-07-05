@@ -8,6 +8,7 @@ using Club_System_API.Helper;
 using Club_System_API.Services;
 using Club_System_API.Dtos.MembershipPayment;
 using Microsoft.EntityFrameworkCore;
+using Club_System_API.Abstractions.Consts;
 
 namespace Club_System_API.Controllers
 {
@@ -27,9 +28,9 @@ namespace Club_System_API.Controllers
 
         }
 
-        // [Authorize(Roles = nameof(DefaultRoles.Admin))]
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] MembershipRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Add([FromForm] MembershipRequest request, CancellationToken cancellationToken)
         {
             var result = await _membershipService.AddAsync(request, cancellationToken);
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
@@ -43,11 +44,11 @@ namespace Club_System_API.Controllers
         }
 
         /// Assign a membership directly to the authenticated user (no payment).
-        [Authorize]
-        [HttpPost("assign/{membershipId}")]
-        public async Task<IActionResult> AssignMembership([FromRoute] int membershipId)
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
+        [HttpPost("assign/{phonenumber}/{membershipId}")]
+        public async Task<IActionResult> AssignMembership([FromRoute]string phonenumber, [FromRoute] int membershipId)
         {
-            var result = await _membershipService.AssignToUserAsync(User.GetUserId(), membershipId);
+            var result = await _membershipService.AssignToUserAsync(phonenumber, membershipId);
             return result.IsSuccess ? Ok() : result.ToProblem();
         }
         // Create Stripe Checkout Session to pay for selected membership.
@@ -62,12 +63,34 @@ namespace Club_System_API.Controllers
                 ? Ok(new { redirectUrl = result.Value })
                 : result.ToProblem();
         }
-
-
-        [HttpGet("verify")]
-        public async Task<IActionResult> Verify([FromQuery] string session_id)
+        [Authorize]
+        [HttpGet("verifyselect")]
+        public async Task<IActionResult> VerifyMembership([FromQuery] string session_id)
         {
             var result = await _membershipService.VerifyStripePaymentAsync(session_id);
+            if (result.IsSuccess)
+                return Ok(result.IsSuccess);
+
+            return BadRequest(result.ToProblem());
+        }
+
+        [Authorize]
+        [HttpGet("Renwal")]
+        public async Task<IActionResult> RenwalMembership()
+        {
+            var domain = $"{Request.Scheme}://{Request.Host}";
+            var result = await _membershipService.CreateRenwalStripeCheckoutSessionAsync(User.GetUserId()!, domain);
+
+            return result.IsSuccess
+                ? Ok(new { redirectUrl = result.Value })
+                : result.ToProblem();
+        }
+
+        [Authorize]
+        [HttpGet("verifyRenwal")]
+        public async Task<IActionResult> VerifyRenwalMembership([FromQuery] string session_id)
+        {
+            var result = await _membershipService.VerifyRenwalStripePaymentAsync(session_id);
             if (result.IsSuccess)
                 return Ok(result.IsSuccess);
 

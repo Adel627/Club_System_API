@@ -7,6 +7,7 @@ using Club_System_API.Models;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 
 namespace Club_System_API.Services;
@@ -78,11 +79,12 @@ public class UserService(UserManager<ApplicationUser> userManager,
                         u.LastName,
                         u.Birth_Of_Date,
                         u.MembershipId,
+                        u.ImageContentType,
                         u.Image,
                         u.IsDisabled,
                         RoleName = r != null ? r.Name : null
                     })
-                    .GroupBy(u => new { u.Id,u.PhoneNumber, u.FirstName, u.LastName, u.MembershipNumber, u.Birth_Of_Date, u.Image, u.MembershipId,  u.IsDisabled })
+                    .GroupBy(u => new { u.Id,u.PhoneNumber, u.FirstName, u.LastName, u.MembershipNumber, u.Birth_Of_Date, u.MembershipId, u.ImageContentType, u.Image, u.IsDisabled })
                     .Select(u => new UserResponse
                     (
                         u.Key.Id,
@@ -91,8 +93,9 @@ public class UserService(UserManager<ApplicationUser> userManager,
                         u.Key.FirstName,
                         u.Key.LastName,
                         u.Key.Birth_Of_Date,
-                        u.Key.Image,
                         u.Key.MembershipId,
+                        u.Key.ImageContentType,
+                        $"data:{u.Key.ImageContentType};base64,{Convert.ToBase64String(u.Key.Image)}",
                         u.Key.IsDisabled,
                         u.Where(x => x.RoleName != null).Select(x => x.RoleName).Distinct().ToList() // Ensure distinct roles
                     ))

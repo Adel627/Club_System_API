@@ -10,7 +10,9 @@
          string PhoneNumber,
          int Salary,
          double AverageRating,
-         byte[]? Image
-         
+         string? ContentType,
+        string? Base64Data
+
+
         );
 }

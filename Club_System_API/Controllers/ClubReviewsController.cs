@@ -1,4 +1,5 @@
 ﻿using Club_System_API.Abstractions;
+using Club_System_API.Abstractions.Consts;
 using Club_System_API.Dtos.ClubReview;
 using Club_System_API.Dtos.ServiceReview;
 using Club_System_API.Extensions;
@@ -13,8 +14,9 @@ namespace Club_System_API.Controllers
     [ApiController]
     public class ClubReviewsController(IClubReviewService clubReviewService) : ControllerBase
     {
-        private readonly IClubReviewService _clubReviewService=clubReviewService;  
-        [Authorize]
+        private readonly IClubReviewService _clubReviewService=clubReviewService; 
+        
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
         [HttpPost]
         public async Task<IActionResult> Add(ClubReviewRequest request,
                 CancellationToken cancellationToken)
@@ -24,7 +26,7 @@ namespace Club_System_API.Controllers
 
         }
 
-        [Authorize]
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
         [HttpPut("")]
         public async Task<IActionResult> Update(ClubReviewRequest request,
              CancellationToken cancellationToken)

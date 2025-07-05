@@ -1,4 +1,5 @@
 ﻿using Club_System_API.Abstractions;
+using Club_System_API.Abstractions.Consts;
 using Club_System_API.Dtos.Coaches;
 using Club_System_API.Dtos.CoachRating;
 using Club_System_API.Extensions;
@@ -11,11 +12,12 @@ namespace Club_System_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+   
     public class CoachReviewsController(ICoachReviewService coachRatingService) : ControllerBase
     {
         private readonly ICoachReviewService _coachReviewService= coachRatingService;
 
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
         [HttpPost]
         public async Task<IActionResult> Add(ReviewCoachRequest request,
                  CancellationToken cancellationToken)
@@ -25,6 +27,7 @@ namespace Club_System_API.Controllers
 
         }
 
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
         [HttpPut("")]
         public async Task<IActionResult> Update(  ReviewCoachRequest request,
              CancellationToken cancellationToken)
@@ -33,6 +36,7 @@ namespace Club_System_API.Controllers
 
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
+
 
         [HttpGet("Get-CoachReviews/{coachid}")]
         public async Task<IActionResult> Get([FromRoute] int coachid)

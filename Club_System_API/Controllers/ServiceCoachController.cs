@@ -20,6 +20,8 @@ namespace Club_System_API.Controllers
          var result= await  _serviceCoachService.AddCoachToServiceAsync(request, cancellationToken);
             return result.IsSuccess ? Created(): result.ToProblem();
         }
+
+
         [HttpDelete("Remove-Coach-From-Service")]
         public async Task<IActionResult> Remove(ServiceCoachRequest request,
             CancellationToken cancellationToken)

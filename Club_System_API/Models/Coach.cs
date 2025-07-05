@@ -13,6 +13,8 @@
         public string PhoneNumber {  get; set; } = string.Empty;
         public int Salary {  get; set; }
         public byte[]? Image { get; set; }
+        public string? ImageContentType { get; set; }
+
         public double AverageRating {  get; set; }
         public ICollection<ServiceCoach> Services { get; set; } = default!;
         public ICollection<CoachReview> Rating { get; set; }= default!;

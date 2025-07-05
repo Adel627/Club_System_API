@@ -17,7 +17,9 @@
         public int DurationInDays { get; set; }
         public bool IsActive { get; set; } = true;
         public byte[]? Image { get; set; }
+        public string? ImageContentType { get; set; }
 
+        public DateTime? CreatedAt { get; set; }=DateTime.UtcNow;
         public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
     }
 } 

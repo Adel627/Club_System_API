@@ -25,7 +25,7 @@ namespace Club_System_API.Controllers
         }
 
         [HttpPut("info")]
-        public async Task<IActionResult> InfoUpdate([FromBody] UpdateProfileRequest request)
+        public async Task<IActionResult> InfoUpdate([FromForm] UpdateProfileRequest request)
         {
             await _userService.UpdateProfileAsync(User.GetUserId()!, request);
 

@@ -1,4 +1,5 @@
 ﻿using Club_System_API.Abstractions;
+using Club_System_API.Abstractions.Consts;
 using Club_System_API.Dtos.CoachRating;
 using Club_System_API.Dtos.ServiceReview;
 using Club_System_API.Extensions;
@@ -15,7 +16,7 @@ namespace Club_System_API.Controllers
     {
         private readonly IServiceReviewService _serviceReviewService = serviceReviewService;
 
-        [Authorize]
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
         [HttpPost]
         public async Task<IActionResult> Add(ServiceReviewRequest request,
                 CancellationToken cancellationToken)
@@ -25,7 +26,7 @@ namespace Club_System_API.Controllers
 
         }
 
-        [Authorize]
+        [Authorize(Roles = nameof(DefaultRoles.Member))]
         [HttpPut("")]
         public async Task<IActionResult> Update(ServiceReviewRequest request,
              CancellationToken cancellationToken)

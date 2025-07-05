@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Club_System_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250629162217_UpdateBooking")]
+    partial class UpdateBooking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,9 +52,6 @@ namespace Club_System_API.Migrations
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImageContentType")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("bit");
@@ -126,7 +126,7 @@ namespace Club_System_API.Migrations
                             EmailConfirmed = false,
                             FirstName = "Club System",
                             IsDisabled = false,
-                            JoinedAt = new DateOnly(2025, 7, 5),
+                            JoinedAt = new DateOnly(2025, 6, 29),
                             LastName = "Admin",
                             LockoutEnabled = false,
                             MembershipNumber = "Admin7",
@@ -274,9 +274,6 @@ namespace Club_System_API.Migrations
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("ImageContentType")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("bit");
 
@@ -352,9 +349,6 @@ namespace Club_System_API.Migrations
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImageContentType")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -458,9 +452,6 @@ namespace Club_System_API.Migrations
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImageContentType")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()

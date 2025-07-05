@@ -9,5 +9,6 @@ public record UserProfileResponse(
     int? MembershipId,
     DateTime? MembershipStartDate,
     DateTime? MembershipEndDate,
-    byte[]? Image
-);
+    string? ContentType,
+        string? Base64Data
+    );

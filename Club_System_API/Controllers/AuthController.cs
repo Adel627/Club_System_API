@@ -13,8 +13,9 @@ namespace Club_System_API.Controllers
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Register([FromForm]RegisterRequest request, CancellationToken cancellationToken)
         {
+          
             var result = await _authService.RegisterAsync(request, cancellationToken);
 
             return result.IsSuccess ? Ok(result) : result.ToProblem();
@@ -24,7 +25,7 @@ namespace Club_System_API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
         {
-
+           
             var authResult = await _authService.GetTokenAsync(request.PhoneNumber, request.Password, cancellationToken);
 
             return authResult.IsSuccess ? Ok(authResult.Value) : authResult.ToProblem();

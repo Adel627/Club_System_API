@@ -6,8 +6,6 @@
             public string UserName { get; set; } = default!;
             public string ServiceName { get; set; } = default!;
             public string CoachName { get; set; } = default!;
-            public DateTime StartTime { get; set; }
-            public DateTime EndTime { get; set; }
             public string Status { get; set; } = default!;
             public bool IsPaid { get; set; }
     } 

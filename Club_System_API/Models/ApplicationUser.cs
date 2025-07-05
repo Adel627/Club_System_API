@@ -11,6 +11,7 @@ namespace Club_System_API.Models
         public DateOnly JoinedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         public bool IsDisabled { get; set; }
         public byte[]? Image { get; set; }
+        public string? ImageContentType {  get; set; }
         public List<RefreshToken> RefreshTokens { get; set; } = [];
         public ICollection<CoachReview> CoachRating { get; set; } = default!;
         public ICollection<Booking> Bookings { get; set; } = default!;

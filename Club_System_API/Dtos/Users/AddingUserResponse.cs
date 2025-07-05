@@ -6,7 +6,8 @@
     string FirstName,
     string LastName,
     DateOnly Birth_Of_Date,
-    byte[]? Image,
+    string? ContentType,
+    string? Base64Data,
     bool IsDisabled
     
 );

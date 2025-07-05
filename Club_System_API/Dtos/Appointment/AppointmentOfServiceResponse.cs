@@ -1,14 +1,13 @@
 ﻿namespace Club_System_API.Dtos.Appointment
 {
-    public record AppointmentResponse
+    public record AppointmentOfServiceResponse
     (
+      int Id,
       int CoachId,
-      int ServiceId,
-      DayOfWeek Day , 
+      DayOfWeek Day,
       TimeOnly? Time,
-    int Duration,
-
+      int? Duration,
       int MaxAttenderNum,
       int CurrentAttenderNum
-    );
+        );
 }

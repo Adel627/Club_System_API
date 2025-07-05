@@ -56,6 +56,7 @@ namespace Club_System_API.Services.service
             currentService.Price = request.Price;
             currentService.Description = request.Description;
             currentService.Image= FormFileExtensions.ConvertToBytes(request.Image);
+            currentService.ImageContentType = request.Image.ContentType;
 
             await _context.SaveChangesAsync(cancellationToken);
 
