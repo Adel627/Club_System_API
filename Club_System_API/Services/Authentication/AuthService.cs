@@ -9,26 +9,22 @@ using Microsoft.EntityFrameworkCore;
 using Club_System_API.Abstractions;
 using Club_System_API.Helper;
 
-
 namespace Club_System_API.Services.Authentication
 {
-
     public class AuthService(
-    UserManager<ApplicationUser> userManager,
-    SignInManager<ApplicationUser> signInManager,
-    IJwtProvider jwtProvider,
-    IHttpContextAccessor httpContextAccessor,
-    ApplicationDbContext context) : IAuthService
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IJwtProvider jwtProvider,
+        IHttpContextAccessor httpContextAccessor,
+        ApplicationDbContext context) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
         private readonly IJwtProvider _jwtProvider = jwtProvider;
-     
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly ApplicationDbContext _context = context;
 
         private readonly int _refreshTokenExpiryDays = 14;
-
 
         public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
         {
@@ -37,41 +33,32 @@ namespace Club_System_API.Services.Authentication
             if (PhoneNumberIsExist)
                 return Result.Failure(UserErrors.DuplicatedPhoneNumber);
 
-
             var user = request.Adapt<ApplicationUser>();
             user.UserName = user.PhoneNumber;
 
             var result = await _userManager.CreateAsync(user, request.Password);
 
-
             if (result.Succeeded)
-            {
-
                 return Result.Success();
-            }
 
             var error = result.Errors.First();
 
             return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
-
         }
 
         public async Task<Result<AuthResponse>> GetTokenAsync(string PhoneNumber, string password, CancellationToken cancellationToken = default)
         {
-            if (await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == PhoneNumber) is not { } user) { 
-                
-                return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);}
- 
+            if (await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == PhoneNumber) is not { } user)
+                return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
 
             if (user.IsDisabled)
                 return Result.Failure<AuthResponse>(UserErrors.DisabledUser);
-
 
             var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
 
             if (result.Succeeded)
             {
-                var userRoles = await _userManager.GetRolesAsync(user); 
+                var userRoles = await _userManager.GetRolesAsync(user);
 
                 var (token, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
                 var refreshToken = GenerateRefreshToken();
@@ -85,17 +72,18 @@ namespace Club_System_API.Services.Authentication
 
                 await _userManager.UpdateAsync(user);
 
-                var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName,user.Birth_Of_Date,user.ImageContentType,string.IsNullOrEmpty( user?.Image?.ToString())?null:$"data:{user.ImageContentType};base64,{Convert.ToBase64String(user?.Image)}", user?.PhoneNumber!,
-                    user?.MembershipId, token, expiresIn, refreshToken, refreshTokenExpiration);
+                var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date, user.ImageContentType,
+                    string.IsNullOrEmpty(user?.Image?.ToString()) ? null : $"data:{user.ImageContentType};base64,{Convert.ToBase64String(user?.Image)}",
+                    user?.PhoneNumber!, user?.MembershipId, token, expiresIn, refreshToken, refreshTokenExpiration);
 
                 return Result.Success(response);
             }
 
             var error = result.IsNotAllowed
-            ? UserErrors.PhoneNumberNotConfirmed
-            : result.IsLockedOut
-            ? UserErrors.LockedUser
-            : UserErrors.InvalidCredentials;
+                ? UserErrors.PhoneNumberNotConfirmed
+                : result.IsLockedOut
+                    ? UserErrors.LockedUser
+                    : UserErrors.InvalidCredentials;
 
             return Result.Failure<AuthResponse>(error);
         }
@@ -107,7 +95,9 @@ namespace Club_System_API.Services.Authentication
             if (userId is null)
                 return Result.Failure<AuthResponse>(UserErrors.InvalidJwtToken);
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _context.Users
+                .Include(u => u.RefreshTokens)
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
             if (user is null)
                 return Result.Failure<AuthResponse>(UserErrors.InvalidJwtToken);
@@ -139,8 +129,9 @@ namespace Club_System_API.Services.Authentication
 
             await _userManager.UpdateAsync(user);
 
-                       
-            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date,user.ImageContentType, $"data:{user.ImageContentType};base64,{Convert.ToBase64String(user.Image)}", user.PhoneNumber,user.MembershipId,
+            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date, user.ImageContentType,
+                user.Image != null ? $"data:{user.ImageContentType};base64,{Convert.ToBase64String(user.Image)}" : null
+, user.PhoneNumber, user.MembershipId,
                 newToken, expiresIn, newRefreshToken, refreshTokenExpiration);
 
             return Result.Success(response);
@@ -153,7 +144,9 @@ namespace Club_System_API.Services.Authentication
             if (userId is null)
                 return Result.Failure(UserErrors.InvalidJwtToken);
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _context.Users
+                .Include(u => u.RefreshTokens)
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
             if (user is null)
                 return Result.Failure(UserErrors.InvalidJwtToken);
@@ -170,16 +163,9 @@ namespace Club_System_API.Services.Authentication
             return Result.Success();
         }
 
-      
-
         private static string GenerateRefreshToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
-
-     
-       
-
     }
-
 }
