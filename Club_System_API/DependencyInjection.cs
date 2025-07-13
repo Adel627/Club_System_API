@@ -33,8 +33,8 @@ namespace Club_System_API
                builder.AllowAnyOrigin()
                    .AllowAnyMethod()
                    .AllowAnyHeader()
-                   //.WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!)
-                ) );
+                //.WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!)
+                ));
 
             services.AddAuthConfig(configuration);
 
@@ -49,22 +49,22 @@ namespace Club_System_API
                 .AddMapsterConfig()
                 .AddFluentValidationConfig();
 
+            services.AddHostedService<BookingRenewalBackgroundService>();
 
             // Add services to the container.
 
 
-            services.AddScoped<IAuthService, AuthService>();                       
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<ICoachService, CoachService>();
             services.AddScoped<ICoachReviewService, CoachReviewService>();
             services.AddScoped<IQAService, QAService>();
-           services.AddScoped<IServiceCoachService, ServiceCoachService>();
-            services.AddScoped<IAppointmentService, AppointmentService>();  
-            services.AddScoped<IUserService,Services.UserService>();
+            services.AddScoped<IServiceCoachService, ServiceCoachService>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IUserService, Services.UserService>();
             services.AddScoped<IServiceReviewService, ServiceReviewService>();
-            services.AddScoped<IClubReviewService,ClubReviewService>(); 
+            services.AddScoped<IClubReviewService, ClubReviewService>();
             services.AddScoped<IMembershipService, MembershipService>();
-            services.AddScoped<IMembershipPaymentService,MembershipPaymentService>();
             services.AddScoped<IStripeService, StripeService>();
             services.AddScoped<IBookingService, BookingService>();
 
@@ -74,7 +74,7 @@ namespace Club_System_API
 
             services.AddHttpContextAccessor();
 
-           
+
 
             return services;
         }
@@ -142,9 +142,10 @@ namespace Club_System_API
         private static IServiceCollection AddAuthConfig(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddIdentity<ApplicationUser, IdentityRole>(options=>{
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
                 options.User.RequireUniqueEmail = false;
-            
+
             })
               .AddEntityFrameworkStores<ApplicationDbContext>()
               .AddDefaultTokenProviders();
@@ -188,7 +189,7 @@ namespace Club_System_API
 
             return services;
         }
-    
+
 
     }
 }

@@ -135,6 +135,8 @@ namespace Club_System_API.Services
 
             booking.IsPaid = true;
             booking.Appointment.CurrentAttenderNum++;
+            booking.Status=BookingStatus.Confirmed;
+            booking.StartDate=DateTime.UtcNow;
             await _context.SaveChangesAsync();
            
 
@@ -142,6 +144,8 @@ namespace Club_System_API.Services
         }
 
        
+
+
         public async Task<Result<List<BookingResponse>>> GetMyBookingsAsync(string userId)
         {
             var bookings = await _context.Bookings
@@ -159,7 +163,8 @@ namespace Club_System_API.Services
                 ServiceName = b.Appointment. Service.Name,
                 CoachName = b.Appointment.Coach.FirstName,
                 Status = b.Status.ToString(),
-                IsPaid = b.IsPaid
+                IsPaid = b.IsPaid,
+                StartDate= b.StartDate, 
             }).ToList();
 
             return Result.Success(response);
@@ -178,12 +183,104 @@ namespace Club_System_API.Services
                 return Result.Failure(BookingErrors.CannotCancelBooking);
 
             booking.Status = BookingStatus.Cancelled;
-            booking.Appointment.CurrentAttenderNum--;
-
+            if (booking.IsPaid)
+            {
+                booking.Appointment.CurrentAttenderNum--;
+                booking.IsPaid = false;
+            }
             await _context.SaveChangesAsync();
             return Result.Success();
         }
-       
+
+
+        //public async Task<Result<string>> CreateRenwalStripeCheckoutSessionAsync(string userId,int bookingid, string domain)
+        //{
+        //    var booking =await _context.Bookings.Include(b => b.Appointment)
+        //        .Include(b=> b.Appointment.Service)
+        //        .FirstOrDefaultAsync(b => b.Id== bookingid);
+
+        //    if (booking == null)
+        //        return Result.Failure<string>(BookingErrors.BookingNotFound);
+
+        //    if  (booking.StartDate != null && DateTime.UtcNow.AddDays(10) <  booking.StartDate.Value.AddMonths(1))
+        //        return Result.Failure<string>(BookingErrors.CanNotRenwal);
+
+        //    var session = await _stripeService.CreateCheckoutSession(
+        //        booking.Appointment.Service.Price,
+        //        $"Booking for {booking.Appointment.Service.Name}",
+        //        $"{domain}/booking-payment-success?session_id={{CHECKOUT_SESSION_ID}}",
+        //        $"{domain}/booking-payment-cancelled",
+        //        new Dictionary<string, string>
+        //        {
+        //    { "bookingId", booking.Id.ToString() },
+        //    { "userId", userId }
+        //        });
+
+        //    booking.StripeSessionId = session.Id;
+
+        //    await _context.SaveChangesAsync();
+
+        //    return Result.Success(session.Url);
+        //}
+
+        //public async Task<Result> VerifyRenwalStripePaymentAsync(string sessionId)
+        //{
+        //    var sessionService = new SessionService();
+        //    var session = await sessionService.GetAsync(sessionId);
+
+           
+
+        //    if (session.PaymentStatus != "paid")
+        //        return Result.Failure(PaymentErrors.PaymentNotComplete);
+
+        //    var userId = session.ClientReferenceId;
+        //    var bookingId = int.Parse(session.Metadata["bookingId"]);
+
+        //    // 1. تأكد إن الدفع موجود في قاعدة البيانات
+        //    var booking = await _context.Bookings.Include(b => b.Appointment)
+        //    .Include(b => b.Appointment.Service)
+        //    .FirstOrDefaultAsync(b => b.Id ==bookingId);
+
+        //    if (booking == null)
+        //        return Result.Failure(PaymentErrors.PaymentNotFound);
+
+        //    if (booking.IsPaid)
+        //        return Result.Success("✅ Payment already verified.");
+
+        //    // 2. حدث حالة الدفع
+        //    booking.IsPaid = true;
+            
+        //    var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+        //    if (booking.StartDate != null && DateTime.UtcNow.AddDays(10) < booking.StartDate.Value.AddMonths(1))
+
+        //        if (booking.StartDate!=null&& DateTime.UtcNow < booking.StartDate.Value.AddMonths(1))
+        //    {
+        //        var x = (usermembership.EndDate - DateTime.UtcNow).Days;
+        //        usermembership.StartDate = DateTime.UtcNow;
+        //        usermembership.EndDate = DateTime.UtcNow
+        //       .AddDays(usermembership.Membership.DurationInDays)
+        //       .AddDays(x);
+
+        //        await _context.SaveChangesAsync();
+
+        //        return Result.Success("✅ Payment verified and membership assigned.");
+        //    }
+
+
+        //    usermembership.StartDate = DateTime.UtcNow;
+        //    usermembership.EndDate = DateTime.UtcNow
+        //   .AddDays(usermembership.Membership.DurationInDays);
+
+        //    await _context.SaveChangesAsync();
+
+        //    await _userManager.AddToRoleAsync(user, nameof(DefaultRoles.Member));
+
+
+        //    return Result.Success("✅ Payment verified and membership assigned.");
+        //}
+
+
+
     }
 
 }

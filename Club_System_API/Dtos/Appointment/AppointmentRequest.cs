@@ -3,7 +3,7 @@
     public record AppointmentRequest(
       int CoachId,
       int ServiceId,  
-      DayOfWeek Day , 
+      string Day , 
       TimeOnly Time ,
     int? Duration,
 

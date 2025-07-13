@@ -36,6 +36,14 @@ namespace Club_System_API.Controllers
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
+        [HttpPost("features/{membershipid}")]
+        public async Task<IActionResult> Add([FromRoute] int membershipid, [FromBody] FeatureRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _membershipService.AddFeatureAsync(membershipid, request, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {

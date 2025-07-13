@@ -37,7 +37,7 @@ namespace Club_System_API.Controllers
         }
 
 
-        [Authorize(Roles = nameof(DefaultRoles.Admin))]
+       // [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
         {
