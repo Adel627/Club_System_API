@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Club_System_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250705141157_updatedayofweek")]
-    partial class updatedayofweek
+    [Migration("20250713205814_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,7 +129,7 @@ namespace Club_System_API.Migrations
                             EmailConfirmed = false,
                             FirstName = "Club System",
                             IsDisabled = false,
-                            JoinedAt = new DateOnly(2025, 7, 5),
+                            JoinedAt = new DateOnly(2025, 7, 13),
                             LastName = "Admin",
                             LockoutEnabled = false,
                             MembershipNumber = "Admin7",
@@ -198,6 +198,9 @@ namespace Club_System_API.Migrations
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasMaxLength(20)
@@ -336,6 +339,28 @@ namespace Club_System_API.Migrations
                     b.ToTable("CoachReviews");
                 });
 
+            modelBuilder.Entity("Club_System_API.Models.Feature", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MembershipId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MembershipId");
+
+                    b.ToTable("Features");
+                });
+
             modelBuilder.Entity("Club_System_API.Models.Membership", b =>
                 {
                     b.Property<int>("Id")
@@ -359,9 +384,6 @@ namespace Club_System_API.Migrations
 
                     b.Property<string>("ImageContentType")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -440,6 +462,38 @@ namespace Club_System_API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("QAs");
+                });
+
+            modelBuilder.Entity("Club_System_API.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RevokedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.Service", b =>
@@ -713,41 +767,7 @@ namespace Club_System_API.Migrations
                         .WithMany("Users")
                         .HasForeignKey("MembershipId");
 
-                    b.OwnsMany("Club_System_API.Models.RefreshToken", "RefreshTokens", b1 =>
-                        {
-                            b1.Property<string>("UserId")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<DateTime>("CreatedOn")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<DateTime>("ExpiresOn")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<DateTime?>("RevokedOn")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<string>("Token")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("UserId", "Id");
-
-                            b1.ToTable("RefreshTokens", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
                     b.Navigation("Membership");
-
-                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.Appointment", b =>
@@ -759,7 +779,7 @@ namespace Club_System_API.Migrations
                         .IsRequired();
 
                     b.HasOne("Club_System_API.Models.Service", "Service")
-                        .WithMany()
+                        .WithMany("appointments")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -822,6 +842,17 @@ namespace Club_System_API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Club_System_API.Models.Feature", b =>
+                {
+                    b.HasOne("Club_System_API.Models.Membership", "Membership")
+                        .WithMany("Features")
+                        .HasForeignKey("MembershipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Membership");
+                });
+
             modelBuilder.Entity("Club_System_API.Models.MembershipPayment", b =>
                 {
                     b.HasOne("Club_System_API.Models.Membership", "Membership")
@@ -850,6 +881,17 @@ namespace Club_System_API.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Club_System_API.Models.RefreshToken", b =>
+                {
+                    b.HasOne("Club_System_API.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.ServiceCoach", b =>
@@ -966,6 +1008,8 @@ namespace Club_System_API.Migrations
 
                     b.Navigation("CoachRating");
 
+                    b.Navigation("RefreshTokens");
+
                     b.Navigation("ServiceReviews");
                 });
 
@@ -978,6 +1022,8 @@ namespace Club_System_API.Migrations
 
             modelBuilder.Entity("Club_System_API.Models.Membership", b =>
                 {
+                    b.Navigation("Features");
+
                     b.Navigation("UserMemberships");
 
                     b.Navigation("Users");
@@ -985,6 +1031,8 @@ namespace Club_System_API.Migrations
 
             modelBuilder.Entity("Club_System_API.Models.Service", b =>
                 {
+                    b.Navigation("appointments");
+
                     b.Navigation("coaches");
 
                     b.Navigation("reviews");
