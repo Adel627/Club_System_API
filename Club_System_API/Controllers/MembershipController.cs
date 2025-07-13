@@ -54,7 +54,7 @@ namespace Club_System_API.Controllers
         /// Assign a membership directly to the authenticated user (no payment).
         [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpPost("assign/{phonenumber}/{membershipId}")]
-        public async Task<IActionResult> AssignMembership([FromRoute]string phonenumber, [FromRoute] int membershipId)
+        public async Task<IActionResult> AssignMembership([FromRoute] string phonenumber, [FromRoute] int membershipId)
         {
             var result = await _membershipService.AssignToUserAsync(phonenumber, membershipId);
             return result.IsSuccess ? Ok() : result.ToProblem();
@@ -104,5 +104,25 @@ namespace Club_System_API.Controllers
 
             return BadRequest(result.ToProblem());
         }
+
+
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromForm] UpdateMembershipRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _membershipService.UpdateAsync(request, cancellationToken);
+
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+        {
+            var result = await _membershipService.DeleteAsync(id, cancellationToken);
+            return result.IsSuccess ? Ok("✅ Membership deleted successfully.") : NotFound(result.Error);
+        }
+
+
+
     }
 }
