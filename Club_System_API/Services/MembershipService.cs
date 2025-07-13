@@ -18,7 +18,7 @@ namespace Club_System_API.Services
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        
+
         public MembershipService(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _context = context;
@@ -29,26 +29,26 @@ namespace Club_System_API.Services
         public async Task<Result<MembershipResponse>> AddAsync(MembershipRequest request, CancellationToken cancellationToken)
         {
             var membership = request.Adapt<Membership>();
-           
+
 
             await _context.Memberships.AddAsync(membership, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            var response = membership.Adapt<MembershipResponse>();  
+            var response = membership.Adapt<MembershipResponse>();
             return Result.Success(response);
-            
+
         }
 
         public async Task<Result<FeatureResponse>> AddFeatureAsync(int membershipid, FeatureRequest request, CancellationToken cancellationToken)
         {
-           var membership =await _context.Memberships.FindAsync(membershipid); 
-            if(membership == null)
+            var membership = await _context.Memberships.FindAsync(membershipid);
+            if (membership == null)
                 return Result.Failure<FeatureResponse>(MembershipErrors.MembershipNotFound);
             var feature = new Feature
             {
                 MembershipId = membershipid,
                 Name = request.features
             };
-            await _context.AddAsync(feature,cancellationToken);
+            await _context.AddAsync(feature, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             var response = feature.Adapt<FeatureResponse>();
             return Result.Success(response);
@@ -57,10 +57,10 @@ namespace Club_System_API.Services
 
         public async Task<List<MembershipResponse>> GetAllAsync(CancellationToken cancellationToken)
         {
-            
-                var memberships = await _context.Memberships
-                .Include(x => x.Features). AsNoTracking()
-                .ToListAsync(cancellationToken);
+
+            var memberships = await _context.Memberships
+            .Include(x => x.Features).AsNoTracking()
+            .ToListAsync(cancellationToken);
 
             var response = memberships.Select(m => new MembershipResponse
             {
@@ -136,7 +136,7 @@ namespace Club_System_API.Services
                                 : new List<string> { membership.Image.ToString() },
                             Name = membership.Name,
                             Description = membership.Description,
-                            
+
                         }
                     },
                     Quantity = 1
@@ -188,9 +188,9 @@ namespace Club_System_API.Services
 
             var purchase = await _context.MembershipPayments.FirstOrDefaultAsync(p => p.StripeSessionId == session.Id);
             var membership = await _context.Memberships
-                .SingleOrDefaultAsync(m=> m.Id== purchase.MembershipId);
+                .SingleOrDefaultAsync(m => m.Id == purchase.MembershipId);
 
-            var user =  _context.Users.SingleOrDefault(u => u.Id== userId);
+            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
             user.MembershipNumber = GenerateMembershipNumberExtensions.GenerateMembershipNumber();
             // Optionally assign membership here
             _context.UserMemberships.Add(new UserMembership
@@ -200,7 +200,7 @@ namespace Club_System_API.Services
                 StartDate = DateTime.UtcNow,
                 EndDate = DateTime.UtcNow.AddDays(membership.DurationInDays)
             });
-            
+
             await _context.SaveChangesAsync();
 
             await _userManager.AddToRoleAsync(user, nameof(DefaultRoles.Member));
@@ -213,7 +213,7 @@ namespace Club_System_API.Services
         {
             var usermembership = await _context.UserMemberships
                 .SingleOrDefaultAsync(u => u.ApplicationUserId == userId);
-            if (usermembership == null) 
+            if (usermembership == null)
                 return Result.Failure<string>(MembershipErrors.MembershipNotFound);
             if (DateTime.UtcNow.AddMonths(6) < usermembership.EndDate)
                 return Result.Failure<string>(MembershipErrors.CanNotRenwal);
@@ -286,7 +286,7 @@ namespace Club_System_API.Services
 
             // 2. حدث حالة الدفع
             payment.IsPaid = true;
-            var usermembership= await _context.UserMemberships.Include(x => x.ApplicationUser)
+            var usermembership = await _context.UserMemberships.Include(x => x.ApplicationUser)
                 .Include(x => x.Membership)
                 .SingleOrDefaultAsync(x => x.ApplicationUserId == userId);
             if (usermembership == null)
@@ -295,7 +295,7 @@ namespace Club_System_API.Services
 
             if (DateTime.UtcNow < usermembership.EndDate)
             {
-                var x = (usermembership.EndDate-DateTime.UtcNow).Days;
+                var x = (usermembership.EndDate - DateTime.UtcNow).Days;
                 usermembership.StartDate = DateTime.UtcNow;
                 usermembership.EndDate = DateTime.UtcNow
                .AddDays(usermembership.Membership.DurationInDays)
@@ -307,9 +307,9 @@ namespace Club_System_API.Services
             }
 
 
-                usermembership.StartDate = DateTime.UtcNow;
-                usermembership.EndDate = DateTime.UtcNow
-               .AddDays(usermembership.Membership.DurationInDays);
+            usermembership.StartDate = DateTime.UtcNow;
+            usermembership.EndDate = DateTime.UtcNow
+           .AddDays(usermembership.Membership.DurationInDays);
 
             await _context.SaveChangesAsync();
 
@@ -319,7 +319,55 @@ namespace Club_System_API.Services
             return Result.Success("✅ Payment verified and membership assigned.");
         }
 
-      
+        public async Task<Result<MembershipResponse>> UpdateAsync(UpdateMembershipRequest request, CancellationToken cancellationToken)
+        {
+            var membership = await _context.Memberships.FindAsync(request.MembershipId);
+
+            if (membership == null)
+                return Result.Failure<MembershipResponse>(MembershipErrors.MembershipNotFound);
+
+            membership.Name = request.Name;
+            membership.Description = request.Description;
+            membership.Price = request.Price;
+            membership.DurationInDays = request.DurationInDays;
+
+            if (request.Image != null)
+            {
+                using var memoryStream = new MemoryStream();
+                await request.Image.CopyToAsync(memoryStream, cancellationToken);
+                membership.Image = memoryStream.ToArray();
+                membership.ImageContentType = request.Image.ContentType;
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var response = membership.Adapt<MembershipResponse>();
+            return Result.Success(response);
+        }
+
+
+        public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken)
+        {
+            var membership = await _context.Memberships
+                .Include(m => m.Features)
+                .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+
+            if (membership == null)
+                return Result.Failure(MembershipErrors.MembershipNotFound);
+
+            // احذف المميزات المرتبطة بالعضوية (لو مربوطة بـ cascade ممكن متحتاجش ده)
+            _context.Features.RemoveRange(membership.Features);
+
+            _context.Memberships.Remove(membership);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success();
+        }
+
+
+
+
+
     }
 
 }
