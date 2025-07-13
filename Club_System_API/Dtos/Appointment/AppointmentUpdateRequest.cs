@@ -2,7 +2,7 @@
 {
     public record AppointmentUpdateRequest
     (
-      DayOfWeek Day,
+      string Day,
       TimeOnly Time,
       int Duration,
       int MaxAttenderNum

@@ -15,6 +15,7 @@
 
         public ICollection<ServiceCoach> coaches { get; set; } = default!;
         public ICollection<ServiceReview> reviews { get; set; } = default!;
+        public ICollection<Appointment> appointments { get; set; } = default!;
 
     }
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
     
 namespace Club_System_API.Models
     {
@@ -11,6 +10,7 @@ namespace Club_System_API.Models
             public int AppointmentId { get; set; }
             public Appointment Appointment { get; set; } = default!;
 
+            public DateTime? StartDate {  get; set; }
             [Required]
             [MaxLength(20)]
         public BookingStatus Status { get; set; } = BookingStatus.Pending;
@@ -22,7 +22,7 @@ namespace Club_System_API.Models
     {
         Pending,
         Confirmed,
-        Cancelled,
-        Completed
+        Cancelled
+        
     }
 }

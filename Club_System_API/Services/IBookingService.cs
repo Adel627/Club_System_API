@@ -11,6 +11,9 @@ namespace Club_System_API.Services
         Task<Result> VerifyStripePaymentAsync(string sessionId);
         Task<Result<List<BookingResponse>>> GetMyBookingsAsync(string userId);
         Task<Result> CancelAsync(string userId, int bookingId);
+       // Task<Result<string>> CreateRenwalStripeCheckoutSessionAsync(string userId, string domain);
+      //  Task<Result> VerifyRenwalStripePaymentAsync(string sessionId);
+
     }
 
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Club_System_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250706083301_AddStartDate")]
+    partial class AddStartDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,7 +129,7 @@ namespace Club_System_API.Migrations
                             EmailConfirmed = false,
                             FirstName = "Club System",
                             IsDisabled = false,
-                            JoinedAt = new DateOnly(2025, 7, 12),
+                            JoinedAt = new DateOnly(2025, 7, 6),
                             LastName = "Admin",
                             LockoutEnabled = false,
                             MembershipNumber = "Admin7",
@@ -336,28 +339,6 @@ namespace Club_System_API.Migrations
                     b.ToTable("CoachReviews");
                 });
 
-            modelBuilder.Entity("Club_System_API.Models.Feature", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("MembershipId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MembershipId");
-
-                    b.ToTable("Features");
-                });
-
             modelBuilder.Entity("Club_System_API.Models.Membership", b =>
                 {
                     b.Property<int>("Id")
@@ -381,6 +362,9 @@ namespace Club_System_API.Migrations
 
                     b.Property<string>("ImageContentType")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -778,7 +762,7 @@ namespace Club_System_API.Migrations
                         .IsRequired();
 
                     b.HasOne("Club_System_API.Models.Service", "Service")
-                        .WithMany("appointments")
+                        .WithMany()
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -839,17 +823,6 @@ namespace Club_System_API.Migrations
                     b.Navigation("Coach");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Club_System_API.Models.Feature", b =>
-                {
-                    b.HasOne("Club_System_API.Models.Membership", "Membership")
-                        .WithMany("Features")
-                        .HasForeignKey("MembershipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Membership");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.MembershipPayment", b =>
@@ -1008,8 +981,6 @@ namespace Club_System_API.Migrations
 
             modelBuilder.Entity("Club_System_API.Models.Membership", b =>
                 {
-                    b.Navigation("Features");
-
                     b.Navigation("UserMemberships");
 
                     b.Navigation("Users");
@@ -1017,8 +988,6 @@ namespace Club_System_API.Migrations
 
             modelBuilder.Entity("Club_System_API.Models.Service", b =>
                 {
-                    b.Navigation("appointments");
-
                     b.Navigation("coaches");
 
                     b.Navigation("reviews");

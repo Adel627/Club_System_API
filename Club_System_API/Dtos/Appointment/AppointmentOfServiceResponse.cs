@@ -3,8 +3,9 @@
     public record AppointmentOfServiceResponse
     (
       int Id,
+      int ServiceId,
       int CoachId,
-      DayOfWeek Day,
+      string Day,
       TimeOnly? Time,
       int? Duration,
       int MaxAttenderNum,

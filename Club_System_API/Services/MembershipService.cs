@@ -1,4 +1,5 @@
-﻿using Club_System_API.Abstractions;
+﻿using Azure;
+using Club_System_API.Abstractions;
 using Club_System_API.Abstractions.Consts;
 using Club_System_API.Dtos.Membership;
 using Club_System_API.Errors;
@@ -37,12 +38,45 @@ namespace Club_System_API.Services
             
         }
 
+        public async Task<Result<FeatureResponse>> AddFeatureAsync(int membershipid, FeatureRequest request, CancellationToken cancellationToken)
+        {
+           var membership =await _context.Memberships.FindAsync(membershipid); 
+            if(membership == null)
+                return Result.Failure<FeatureResponse>(MembershipErrors.MembershipNotFound);
+            var feature = new Feature
+            {
+                MembershipId = membershipid,
+                Name = request.features
+            };
+            await _context.AddAsync(feature,cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            var response = feature.Adapt<FeatureResponse>();
+            return Result.Success(response);
+
+        }
+
         public async Task<List<MembershipResponse>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _context.Memberships.AsNoTracking()
-                .ProjectToType<MembershipResponse> ()
+            
+                var memberships = await _context.Memberships
+                .Include(x => x.Features). AsNoTracking()
                 .ToListAsync(cancellationToken);
-                
+
+            var response = memberships.Select(m => new MembershipResponse
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Description = m.Description,
+                Price = m.Price,
+                DurationInDays = m.DurationInDays,
+                ContentType = m.ImageContentType,
+                Base64Data = m.Image != null ? Convert.ToBase64String(m.Image) : null,
+                CreatedAt = m.CreatedAt,
+                features = m.Features.Select(f => f.Name).ToList()
+            }).ToList();
+
+            return response;
+
         }
 
         public async Task<Result> AssignToUserAsync(string phonenumber, int membershipId)
@@ -285,7 +319,7 @@ namespace Club_System_API.Services
             return Result.Success("✅ Payment verified and membership assigned.");
         }
 
-
+      
     }
 
 }

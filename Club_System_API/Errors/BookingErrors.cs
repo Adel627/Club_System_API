@@ -37,5 +37,9 @@
 
             public static readonly Error CoachUnavailable =
                 new("Booking.CoachUnavailable", "The selected coach is unavailable at the chosen time.", StatusCodes.Status400BadRequest);
-        }
-  }
+        public static readonly Error CanNotRenwal =
+           new("Renwal.NotAllowed", "You Can Renwal Your Booking in The Last 10 days only", StatusCodes.Status405MethodNotAllowed);
+
+
+    }
+}

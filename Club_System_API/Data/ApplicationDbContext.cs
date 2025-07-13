@@ -24,7 +24,7 @@ public class ApplicationDbContext :
     public DbSet<Membership> Memberships { get; set; }
     public DbSet<MembershipPayment> MembershipPayments { get; set; }
     public DbSet<UserMembership> UserMemberships { get; set; }
-
+    public DbSet<Feature> Features { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

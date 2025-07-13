@@ -8,7 +8,7 @@
 
         public int CoachId { get; set; }
         public Coach Coach { get; set; } = default!;
-        public DayOfWeek Day { get; set; }
+        public string Day { get; set; }
         public TimeOnly Time { get; set; }
         public int? Duration {  get; set; }
         public int MaxAttenderNum { get; set; }

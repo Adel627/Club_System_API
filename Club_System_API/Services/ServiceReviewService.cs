@@ -93,7 +93,7 @@ namespace Club_System_API.Services
                 .Where(r => r.ServiceId == serviceid)
                 .Select(r => new ServiceReviewWithUserImageResponse(
                     r.User.ImageContentType,
-                    $"data:{r.User.ImageContentType};base64,{Convert.ToBase64String(r.User.Image)}",
+                    r.User.Image != null ? $"data:{r.User.ImageContentType};base64,{Convert.ToBase64String(r.User.Image)}" : null,
                     r.User.FirstName,
                     r.User.LastName,
                     r.ReviewAt,

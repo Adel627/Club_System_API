@@ -10,5 +10,6 @@
         public string? ContentType {  get; set; }
         public string? Base64Data {  get; set; }
          public DateTime? CreatedAt { get; set; }
+        public ICollection<string>features { get; set; }=null!;
     }
 }

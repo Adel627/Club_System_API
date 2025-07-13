@@ -64,7 +64,29 @@ namespace Club_System_API.Controllers
             var result = await _bookingService.CancelAsync(userId, bookingId);
             return result.IsSuccess ? Ok() : result.ToProblem();
         }
-       
+        //[Authorize]
+        //[HttpGet("Renwal")]
+        //public async Task<IActionResult> RenwalBooking()
+        //{
+        //    var domain = $"{Request.Scheme}://{Request.Host}";
+        //    var result = await _bookingService.CreateRenwalStripeCheckoutSessionAsync(User.GetUserId()!, domain);
+
+        //    return result.IsSuccess
+        //        ? Ok(new { redirectUrl = result.Value })
+        //        : result.ToProblem();
+        //}
+
+        //[Authorize]
+        //[HttpGet("verifyRenwal")]
+        //public async Task<IActionResult> VerifyRenwalBooking([FromQuery] string session_id)
+        //{
+        //    var result = await _bookingService.VerifyRenwalStripePaymentAsync(session_id);
+        //    if (result.IsSuccess)
+        //        return Ok(result.IsSuccess);
+
+        //    return BadRequest(result.ToProblem());
+        //}
+
     }
 }
 

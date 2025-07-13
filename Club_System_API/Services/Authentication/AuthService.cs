@@ -140,7 +140,7 @@ namespace Club_System_API.Services.Authentication
             await _userManager.UpdateAsync(user);
 
                        
-            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date,user.ImageContentType, $"data:{user.ImageContentType};base64,{Convert.ToBase64String(user.Image)}", user.PhoneNumber,user.MembershipId,
+            var response = new AuthResponse(user.Id, user.MembershipNumber, user.FirstName, user.LastName, user.Birth_Of_Date,user.ImageContentType,user.Image !=null? $"data:{user.ImageContentType};base64,{Convert.ToBase64String(user.Image)}":null, user.PhoneNumber,user.MembershipId,
                 newToken, expiresIn, newRefreshToken, refreshTokenExpiration);
 
             return Result.Success(response);
