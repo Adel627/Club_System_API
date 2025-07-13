@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Club_System_API.Models; // لو هتحتاج الـ enums
+using System.Collections.Generic;
 
 namespace Club_System_API.Dtos.Authentication
 {
@@ -11,10 +13,14 @@ namespace Club_System_API.Dtos.Authentication
         string? ContentType,
         string? Base64Data,
         string PhoneNumber,
-        int? MembershipId ,
+        int? MembershipId,
         string Token,
         int ExpiresIn,
         string RefreshToken,
-        DateTime RefreshTokenExpiration
+        DateTime RefreshTokenExpiration,
+
+        // ✅ الجديد اللي هنرجعه في الـ response:
+        MembershipDetailsDto? MembershipDetails,
+        List<ServiceBookingDto>? Services
     );
 }

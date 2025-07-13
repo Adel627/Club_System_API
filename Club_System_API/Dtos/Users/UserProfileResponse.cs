@@ -10,5 +10,7 @@ public record UserProfileResponse(
     DateTime? MembershipStartDate,
     DateTime? MembershipEndDate,
     string? ContentType,
-        string? Base64Data
-    );
+    string? Base64Data,
+
+    List<UserServiceDto> Services 
+);
