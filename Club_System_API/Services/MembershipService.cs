@@ -319,9 +319,9 @@ namespace Club_System_API.Services
             return Result.Success("✅ Payment verified and membership assigned.");
         }
 
-        public async Task<Result<MembershipResponse>> UpdateAsync(UpdateMembershipRequest request, CancellationToken cancellationToken)
+        public async Task<Result<MembershipResponse>> UpdateAsync(int id, UpdateMembershipRequest request, CancellationToken cancellationToken)
         {
-            var membership = await _context.Memberships.FindAsync(request.MembershipId);
+            var membership = await _context.Memberships.FindAsync(id);
 
             if (membership == null)
                 return Result.Failure<MembershipResponse>(MembershipErrors.MembershipNotFound);
@@ -330,34 +330,26 @@ namespace Club_System_API.Services
             membership.Description = request.Description;
             membership.Price = request.Price;
             membership.DurationInDays = request.DurationInDays;
+            membership.Image = FormFileExtensions.ConvertToBytes(request.Image);
+            membership.ImageContentType = request.Image.ContentType;
 
-            if (request.Image != null)
-            {
-                using var memoryStream = new MemoryStream();
-                await request.Image.CopyToAsync(memoryStream, cancellationToken);
-                membership.Image = memoryStream.ToArray();
-                membership.ImageContentType = request.Image.ContentType;
-            }
-
+           
             await _context.SaveChangesAsync(cancellationToken);
-
             var response = membership.Adapt<MembershipResponse>();
+
             return Result.Success(response);
+        
         }
 
 
         public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            var membership = await _context.Memberships
-                .Include(m => m.Features)
-                .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            var membership = await _context.Memberships.FindAsync(id);
 
             if (membership == null)
                 return Result.Failure(MembershipErrors.MembershipNotFound);
 
-            // احذف المميزات المرتبطة بالعضوية (لو مربوطة بـ cascade ممكن متحتاجش ده)
-            _context.Features.RemoveRange(membership.Features);
-
+           
             _context.Memberships.Remove(membership);
             await _context.SaveChangesAsync(cancellationToken);
 

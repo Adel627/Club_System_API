@@ -18,7 +18,7 @@ namespace Club_System_API.Services
         Task<Result> VerifyRenwalStripePaymentAsync(string sessionId);
 
 
-        Task<Result<MembershipResponse>> UpdateAsync(UpdateMembershipRequest request, CancellationToken cancellationToken);
+        Task<Result<MembershipResponse>> UpdateAsync(int id, UpdateMembershipRequest request, CancellationToken cancellationToken);
 
         Task<Result> DeleteAsync(int id, CancellationToken cancellationToken);
 

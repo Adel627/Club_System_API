@@ -110,7 +110,7 @@ namespace Club_System_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromForm] UpdateMembershipRequest request, CancellationToken cancellationToken)
         {
-            var result = await _membershipService.UpdateAsync(request, cancellationToken);
+            var result = await _membershipService.UpdateAsync( id, request, cancellationToken);
 
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }

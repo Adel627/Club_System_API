@@ -21,16 +21,19 @@ public class BookingRenewalBackgroundService : BackgroundService
 
             var now = DateTime.UtcNow;
 
-            var expiredBookings = await context.Bookings
+            var expiredBookings = await context.Bookings.Include(x=>x.Appointment)
                 .Where(b => b.IsPaid && b.StartDate != null && b.StartDate.Value.AddMonths(1) <= now)
                 .ToListAsync();
 
 
             foreach (var booking in expiredBookings)
             {
+                
                 booking.IsPaid = false;
                 booking.Status = BookingStatus.Pending;
                 booking.StripeSessionId = null;
+                booking.Appointment.CurrentAttenderNum--;
+
 
             }
 

@@ -2,7 +2,6 @@
 {
     public class UpdateMembershipRequest
     {
-        public int MembershipId { get; set; } // ✅ ده اللي ناقص
 
         public string Name { get; set; } = null!;
         public string? Description { get; set; }

@@ -193,91 +193,92 @@ namespace Club_System_API.Services
         }
 
 
-        //public async Task<Result<string>> CreateRenwalStripeCheckoutSessionAsync(string userId,int bookingid, string domain)
-        //{
-        //    var booking =await _context.Bookings.Include(b => b.Appointment)
-        //        .Include(b=> b.Appointment.Service)
-        //        .FirstOrDefaultAsync(b => b.Id== bookingid);
-
-        //    if (booking == null)
-        //        return Result.Failure<string>(BookingErrors.BookingNotFound);
-
-        //    if  (booking.StartDate != null && DateTime.UtcNow.AddDays(10) <  booking.StartDate.Value.AddMonths(1))
-        //        return Result.Failure<string>(BookingErrors.CanNotRenwal);
-
-        //    var session = await _stripeService.CreateCheckoutSession(
-        //        booking.Appointment.Service.Price,
-        //        $"Booking for {booking.Appointment.Service.Name}",
-        //        $"{domain}/booking-payment-success?session_id={{CHECKOUT_SESSION_ID}}",
-        //        $"{domain}/booking-payment-cancelled",
-        //        new Dictionary<string, string>
-        //        {
-        //    { "bookingId", booking.Id.ToString() },
-        //    { "userId", userId }
-        //        });
-
-        //    booking.StripeSessionId = session.Id;
-
-        //    await _context.SaveChangesAsync();
-
-        //    return Result.Success(session.Url);
-        //}
-
-        //public async Task<Result> VerifyRenwalStripePaymentAsync(string sessionId)
-        //{
-        //    var sessionService = new SessionService();
-        //    var session = await sessionService.GetAsync(sessionId);
+        public async Task<Result<string>> CreateRenwalStripeCheckoutSessionAsync(string userId, int bookingid, string domain)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Appointment)
+                .Include(b => b.Appointment.Service)
+                .FirstOrDefaultAsync(b => b.Id == bookingid);
 
            
 
-        //    if (session.PaymentStatus != "paid")
-        //        return Result.Failure(PaymentErrors.PaymentNotComplete);
+            if (booking == null)
+                return Result.Failure<string>(BookingErrors.BookingNotFound);
 
-        //    var userId = session.ClientReferenceId;
-        //    var bookingId = int.Parse(session.Metadata["bookingId"]);
+            //can renwal in last 10 days only 
+            if (booking.StartDate != null && DateTime.UtcNow.AddDays(10) < booking.StartDate.Value.AddMonths(1))
+                return Result.Failure<string>(BookingErrors.CanNotRenwal);
 
-        //    // 1. تأكد إن الدفع موجود في قاعدة البيانات
-        //    var booking = await _context.Bookings.Include(b => b.Appointment)
-        //    .Include(b => b.Appointment.Service)
-        //    .FirstOrDefaultAsync(b => b.Id ==bookingId);
-
-        //    if (booking == null)
-        //        return Result.Failure(PaymentErrors.PaymentNotFound);
-
-        //    if (booking.IsPaid)
-        //        return Result.Success("✅ Payment already verified.");
-
-        //    // 2. حدث حالة الدفع
-        //    booking.IsPaid = true;
-            
-        //    var user = _context.Users.SingleOrDefault(u => u.Id == userId);
-        //    if (booking.StartDate != null && DateTime.UtcNow.AddDays(10) < booking.StartDate.Value.AddMonths(1))
-
-        //        if (booking.StartDate!=null&& DateTime.UtcNow < booking.StartDate.Value.AddMonths(1))
-        //    {
-        //        var x = (usermembership.EndDate - DateTime.UtcNow).Days;
-        //        usermembership.StartDate = DateTime.UtcNow;
-        //        usermembership.EndDate = DateTime.UtcNow
-        //       .AddDays(usermembership.Membership.DurationInDays)
-        //       .AddDays(x);
-
-        //        await _context.SaveChangesAsync();
-
-        //        return Result.Success("✅ Payment verified and membership assigned.");
-        //    }
+            if (booking.StartDate == null && booking.Appointment.CurrentAttenderNum >=booking.Appointment.MaxAttenderNum)
+                return Result.Failure<string>(BookingErrors.AppointmentFull);
 
 
-        //    usermembership.StartDate = DateTime.UtcNow;
-        //    usermembership.EndDate = DateTime.UtcNow
-        //   .AddDays(usermembership.Membership.DurationInDays);
+            var session = await _stripeService.CreateCheckoutSession(
+                booking.Appointment.Service.Price,
+                $"Booking for {booking.Appointment.Service.Name}",
+                $"{domain}/booking-payment-success?session_id={{CHECKOUT_SESSION_ID}}",
+                $"{domain}/booking-payment-cancelled",
+                new Dictionary<string, string>
+                {
+            { "bookingId", booking.Id.ToString() },
+            { "userId", userId }
+                });
 
-        //    await _context.SaveChangesAsync();
+            booking.StripeSessionId = session.Id;
 
-        //    await _userManager.AddToRoleAsync(user, nameof(DefaultRoles.Member));
+            await _context.SaveChangesAsync();
+
+            return Result.Success(session.Url);
+        }
+
+        public async Task<Result> VerifyRenwalStripePaymentAsync(string sessionId)
+        {
+            var sessionService = new SessionService();
+            var session = await sessionService.GetAsync(sessionId);
 
 
-        //    return Result.Success("✅ Payment verified and membership assigned.");
-        //}
+
+            if (session.PaymentStatus != "paid")
+                return Result.Failure(PaymentErrors.PaymentNotComplete);
+
+            var userId = session.Metadata["userId"];
+            var bookingId = int.Parse(session.Metadata["bookingId"]);
+
+            // 1. تأكد إن الدفع موجود في قاعدة البيانات
+            var booking = await _context.Bookings.Include(b => b.Appointment)
+            .Include(b => b.Appointment.Service)
+            .FirstOrDefaultAsync(b => b.Id == bookingId);
+
+            if (booking == null)
+                return Result.Failure(PaymentErrors.PaymentNotFound);
+
+            if (booking.IsPaid)
+                return Result.Success("✅ Payment already verified.");
+
+            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+
+            if (booking.StartDate == null) 
+            {
+
+                booking.IsPaid = true;
+                booking.Appointment.CurrentAttenderNum++;
+                booking.Status = BookingStatus.Confirmed;
+                booking.StartDate = DateTime.UtcNow;
+            }else
+            {
+                var duration =  booking.StartDate.Value.AddMonths(1) - DateTime.UtcNow ;
+
+                booking.IsPaid = true;
+                booking.Status = BookingStatus.Confirmed;
+                booking.StartDate = DateTime.UtcNow+duration;
+
+            }
+              await _context.SaveChangesAsync();
+              return Result.Success("✅ Payment verified and Renwal completed");
+        }
+
+
+        
 
 
 
