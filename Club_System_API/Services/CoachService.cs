@@ -60,8 +60,12 @@ namespace Club_System_API.Services
             currentCoach.Birth_Of_Date = request.Birth_Of_Date;
             currentCoach.PhoneNumber = request.PhoneNumber;
             currentCoach.Salary = request.Salary;
-            currentCoach.Image=FormFileExtensions.ConvertToBytes(request.Image);
-            currentCoach.ImageContentType=request.Image.ContentType;
+            if (request.Image is not null)
+            {
+                currentCoach.Image = FormFileExtensions.ConvertToBytes(request.Image);
+                currentCoach.ImageContentType = request.Image.ContentType;
+            }
+
 
             await _context.SaveChangesAsync(cancellationToken);
 
