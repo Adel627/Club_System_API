@@ -134,11 +134,11 @@ namespace Club_System_API.Services.Authentication
                 return Result.Failure<AuthResponse>(UserErrors.LockedUser);
 
             var userRefreshToken = await _context.RefreshTokens
-                .Where(rt => rt.ApplicationUserId == user.Id && rt.Token == refreshToken && rt.IsActive)
-                .FirstOrDefaultAsync();
-
-            if (userRefreshToken is null)
+    .Where(rt => rt.ApplicationUserId == user.Id && rt.Token == refreshToken)
+    .FirstOrDefaultAsync();
+            if (userRefreshToken == null || !userRefreshToken.IsActive)
                 return Result.Failure<AuthResponse>(UserErrors.InvalidRefreshToken);
+
 
             userRefreshToken.RevokedOn = DateTime.UtcNow;
             _context.RefreshTokens.Update(userRefreshToken);
