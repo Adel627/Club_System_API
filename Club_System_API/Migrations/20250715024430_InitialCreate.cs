@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Club_System_API.Migrations
 {
     /// <inheritdoc />
-    public partial class initialCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -536,7 +536,7 @@ namespace Club_System_API.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "Birth_Of_Date", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "Image", "ImageContentType", "IsDisabled", "JoinedAt", "LastName", "LockoutEnabled", "LockoutEnd", "MembershipId", "MembershipNumber", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "6dc6528a-b280-4770-9eae-82671ee81ef7", 0, new DateOnly(2001, 12, 20), "99d2bbc6-bc54-4248-a172-a77de3ae4430", null, false, "Club System", null, null, false, new DateOnly(2025, 7, 14), "Admin", false, null, null, "Admin7", null, "ADMIN7", "AQAAAAIAAYagAAAAEG11fXlkvcGxeUaPMcHd42YNq9TZKK3UfeGAXgrhHVQTIaDq50veaZghpOpmlPQ4cg==", "01120443096", true, "55BF92C9EF0249CDA210D85D1A851BC9", false, "Admin7" });
+                values: new object[] { "6dc6528a-b280-4770-9eae-82671ee81ef7", 0, new DateOnly(2001, 12, 20), "99d2bbc6-bc54-4248-a172-a77de3ae4430", null, false, "Club System", null, null, false, new DateOnly(2025, 7, 15), "Admin", false, null, null, "Admin7", null, "ADMIN7", "AQAAAAIAAYagAAAAEG11fXlkvcGxeUaPMcHd42YNq9TZKK3UfeGAXgrhHVQTIaDq50veaZghpOpmlPQ4cg==", "01120443096", true, "55BF92C9EF0249CDA210D85D1A851BC9", false, "Admin7" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
