@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Club_System_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250714011322_initialCreate")]
-    partial class initialCreate
+    [Migration("20250715033039_AddRefreshTokenTable")]
+    partial class AddRefreshTokenTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,7 +129,7 @@ namespace Club_System_API.Migrations
                             EmailConfirmed = false,
                             FirstName = "Club System",
                             IsDisabled = false,
-                            JoinedAt = new DateOnly(2025, 7, 14),
+                            JoinedAt = new DateOnly(2025, 7, 15),
                             LastName = "Admin",
                             LockoutEnabled = false,
                             MembershipNumber = "Admin7",

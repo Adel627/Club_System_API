@@ -43,15 +43,16 @@ namespace Club_System_API.Services.Authentication
                 var refreshToken = GenerateRefreshToken();
                 var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
-                user.RefreshTokens.Add(new RefreshToken
+                // ✅ تم التعديل هنا
+                await _context.RefreshTokens.AddAsync(new RefreshToken
                 {
                     Token = refreshToken,
-                    ExpiresOn = refreshTokenExpiration
+                    ExpiresOn = refreshTokenExpiration,
+                    ApplicationUserId = user.Id
                 });
 
-                await _userManager.UpdateAsync(user);
+                await _context.SaveChangesAsync();
 
-                // ✅ Get Latest Membership
                 MembershipDetailsDto? membershipDto = null;
 
                 var userMembership = await _context.UserMemberships
@@ -73,7 +74,6 @@ namespace Club_System_API.Services.Authentication
                     );
                 }
 
-                // ✅ Services
                 var bookings = await _context.Bookings
                     .Include(b => b.Appointment)
                         .ThenInclude(a => a.Service)
@@ -133,26 +133,31 @@ namespace Club_System_API.Services.Authentication
             if (user.LockoutEnd > DateTime.UtcNow)
                 return Result.Failure<AuthResponse>(UserErrors.LockedUser);
 
-            var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken && x.IsActive);
-            if (userRefreshToken is null)
+            var userRefreshToken = await _context.RefreshTokens
+    .Where(rt => rt.ApplicationUserId == user.Id && rt.Token == refreshToken)
+    .FirstOrDefaultAsync();
+            if (userRefreshToken == null || !userRefreshToken.IsActive)
                 return Result.Failure<AuthResponse>(UserErrors.InvalidRefreshToken);
 
+
             userRefreshToken.RevokedOn = DateTime.UtcNow;
+            _context.RefreshTokens.Update(userRefreshToken);
 
             var userRoles = await _userManager.GetRolesAsync(user);
             var (newToken, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
             var newRefreshToken = GenerateRefreshToken();
             var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
-            user.RefreshTokens.Add(new RefreshToken
+            // ✅ تم التعديل هنا
+            await _context.RefreshTokens.AddAsync(new RefreshToken
             {
                 Token = newRefreshToken,
-                ExpiresOn = refreshTokenExpiration
+                ExpiresOn = refreshTokenExpiration,
+                ApplicationUserId = user.Id
             });
 
-            await _userManager.UpdateAsync(user);
+            await _context.SaveChangesAsync();
 
-            // ✅ Get Latest Membership
             MembershipDetailsDto? membershipDto = null;
 
             var userMembership = await _context.UserMemberships
@@ -174,7 +179,6 @@ namespace Club_System_API.Services.Authentication
                 );
             }
 
-            // ✅ Services
             var bookings = await _context.Bookings
                 .Include(b => b.Appointment)
                     .ThenInclude(a => a.Service)
@@ -236,12 +240,17 @@ namespace Club_System_API.Services.Authentication
             if (user is null)
                 return Result.Failure(UserErrors.InvalidJwtToken);
 
-            var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken && x.IsActive);
+            var userRefreshToken = await _context.RefreshTokens
+                .Where(rt => rt.ApplicationUserId == user.Id && rt.Token == refreshToken && rt.IsActive)
+                .FirstOrDefaultAsync();
+
             if (userRefreshToken is null)
                 return Result.Failure(UserErrors.InvalidRefreshToken);
 
             userRefreshToken.RevokedOn = DateTime.UtcNow;
-            await _userManager.UpdateAsync(user);
+            _context.RefreshTokens.Update(userRefreshToken);
+
+            await _context.SaveChangesAsync();
             return Result.Success();
         }
 
