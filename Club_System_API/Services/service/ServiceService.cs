@@ -77,6 +77,7 @@ namespace Club_System_API.Services.service
                 service.images.Select(si => si.Url).ToList(),
                 service.AverageRating,
                 service.appointments.Select(s => new TimeTableResponse(
+                        s. Id  ,
                         s.CoachId,
                         s.Coach.FirstName +" "+ s.Coach.FirstName ,
                         s.Day,

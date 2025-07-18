@@ -1,6 +1,7 @@
 ﻿using Club_System_API.Abstractions;
 using Club_System_API.Abstractions.Consts;
 using Club_System_API.Dtos.Coaches;
+using Club_System_API.Extensions;
 using Club_System_API.Models;
 using Club_System_API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -43,10 +44,14 @@ namespace Club_System_API.Controllers
         }
 
 
+        [Authorize]
         [HttpGet("")]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAll( CancellationToken cancellationToken)
         {
-            return Ok(await _coachService.GetAllAsync(cancellationToken));
+            bool isadmin = false;
+            if(User.IsInRole(nameof( DefaultRoles.Admin)))
+                isadmin = true;
+            return Ok(await _coachService.GetAllAsync(isadmin, cancellationToken));
         }
 
         [HttpGet("{id}")]

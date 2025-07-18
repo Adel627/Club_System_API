@@ -8,6 +8,7 @@ namespace Club_System_API.Dtos.Coaches
          int Id,
          string FirstName,
          string LastName,
+         string PhoneNumber,
          string Specialty,
          string? Bio,
          string? Description,
@@ -16,6 +17,7 @@ namespace Club_System_API.Dtos.Coaches
         string? Base64Data,
         ICollection<string> Achievments,
         ICollection<CoachReviewWithUserImageResponse> ReviewCoachResponse
+
 
         );
 }

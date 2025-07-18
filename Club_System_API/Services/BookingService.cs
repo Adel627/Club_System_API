@@ -19,14 +19,17 @@ namespace Club_System_API.Services
         private readonly ApplicationDbContext _context;
         private readonly StripeSettings _stripeSettings;
         private readonly IStripeService _stripeService;
-        private readonly UserManager<ApplicationUser> _userManager; 
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly FrontStripe _frontstripe;
 
-        public BookingService(ApplicationDbContext context, IOptions<StripeSettings> stripeOptions, IStripeService stripeService,UserManager<ApplicationUser> userManager)
+        public BookingService(ApplicationDbContext context, IOptions<StripeSettings> stripeOptions,
+            IStripeService stripeService,UserManager<ApplicationUser> userManager, IOptions<FrontStripe> frontstripeOptions)
         {
             _context = context;
             _stripeSettings = stripeOptions.Value;
             _stripeService = stripeService;
             _userManager = userManager;
+            _frontstripe = frontstripeOptions.Value;
         }
 
         public async Task<Result<BookingResponse>> BookAsync(string userId, int appointmentid)
@@ -92,8 +95,8 @@ namespace Club_System_API.Services
             var session = await _stripeService.CreateCheckoutSession(
                 booking.Appointment.Service.Price,
                 $"Booking for {booking.Appointment.Service.Name}",
-                $"{domain}/booking-payment-success?session_id={{CHECKOUT_SESSION_ID}}",
-                $"{domain}/booking-payment-cancelled",
+                $"{_frontstripe.Domain}/booking-payment-success?session_id={{CHECKOUT_SESSION_ID}}",
+                $"{_frontstripe.Domain}/booking-payment-cancelled",
                 new Dictionary<string, string>
                 {
             { "bookingId", booking.Id.ToString() },
@@ -217,8 +220,8 @@ namespace Club_System_API.Services
             var session = await _stripeService.CreateCheckoutSession(
                 booking.Appointment.Service.Price,
                 $"Booking for {booking.Appointment.Service.Name}",
-                $"{domain}/booking-payment-success?session_id={{CHECKOUT_SESSION_ID}}",
-                $"{domain}/booking-payment-cancelled",
+                $"{_frontstripe.Domain}/booking-payment-success?session_id={{CHECKOUT_SESSION_ID}}",
+                $"{_frontstripe.Domain}/booking-payment-cancelled",
                 new Dictionary<string, string>
                 {
             { "bookingId", booking.Id.ToString() },

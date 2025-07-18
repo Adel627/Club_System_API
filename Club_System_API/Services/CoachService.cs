@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Club_System_API.Services
 {
-    public class CoachService:ICoachService
+    public class CoachService : ICoachService
     {
         private readonly ApplicationDbContext _context;
         public CoachService(ApplicationDbContext context)
@@ -18,12 +18,12 @@ namespace Club_System_API.Services
         }
         public async Task<Result<CoachResponse>> AddAsync(CoachRequest request, CancellationToken cancellationToken = default)
         {
-            var PhonenumberIsExist= await _context.Coachs.AnyAsync(x => x.PhoneNumber == request.PhoneNumber);
+            var PhonenumberIsExist = await _context.Coachs.AnyAsync(x => x.PhoneNumber == request.PhoneNumber);
             if (PhonenumberIsExist)
-               return Result.Failure<CoachResponse>(CoachErrors.DuplicatedPhoneNumber);
+                return Result.Failure<CoachResponse>(CoachErrors.DuplicatedPhoneNumber);
 
             var coach = request.Adapt<CoachWithReviewsResponse>();
-          await _context.AddAsync(coach, cancellationToken);
+            await _context.AddAsync(coach, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success(coach.Adapt<CoachResponse>());
         }
@@ -36,15 +36,23 @@ namespace Club_System_API.Services
             if (_context.Achievment.Where(x => x.coachId == coachid).Any(x => x.Name == request.Achievment))
                 return Result.Failure(CoachErrors.DuplicatedAchievment);
 
-                var achivment = new Achievment { coachId = coachid, Name = request.Achievment };
+            var achivment = new Achievment { coachId = coachid, Name = request.Achievment };
             await _context.AddAsync(achivment, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
 
-        public async Task<IEnumerable<CoachResponse>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<CoachResponse>> GetAllAsync( bool isadmin,CancellationToken cancellationToken = default)
         {
-            return await _context.Coachs.Where(x=> x.IsDisabled!=true)
+            if (isadmin)
+            {
+                return await _context.Coachs
+               .AsNoTracking()
+               .ProjectToType<CoachResponse>()
+               .ToListAsync(cancellationToken);
+            }
+
+            return await _context.Coachs.Where(x => x.IsDisabled != true)
            .AsNoTracking()
            .ProjectToType<CoachResponse>()
            .ToListAsync(cancellationToken);

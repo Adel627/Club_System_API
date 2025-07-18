@@ -9,7 +9,9 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Stripe.Checkout;
+using static System.Net.WebRequestMethods;
 
 namespace Club_System_API.Services
 {
@@ -18,12 +20,16 @@ namespace Club_System_API.Services
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly FrontStripe _frontstripe;
 
-        public MembershipService(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public MembershipService(ApplicationDbContext context, IMapper mapper,
+            UserManager<ApplicationUser> userManager, IOptions<FrontStripe> frontstripeOptions)
         {
+
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
+            _frontstripe = frontstripeOptions.Value;
         }
 
         public async Task<Result<MembershipResponse>> AddAsync(MembershipRequest request, CancellationToken cancellationToken)
@@ -126,7 +132,7 @@ namespace Club_System_API.Services
            await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
-
+       
         public async Task<Result<string>> CreateStripeCheckoutSessionAsync(string userId, int membershipId, string domain)
         {
             if(await _context.UserMemberships.AnyAsync(x=> x.ApplicationUserId == userId))
@@ -151,10 +157,6 @@ namespace Club_System_API.Services
                         UnitAmountDecimal = membership.Price * 100,
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-
-                            //Images = string.IsNullOrWhiteSpace(membership.Image?.ToString())
-                            //    ? null
-                            //    : new List<string> { membership.Image.ToString() },
                             Name = membership.Name,
                             Description = membership.Description,
 
@@ -163,9 +165,10 @@ namespace Club_System_API.Services
                     Quantity = 1
                 }
             },
+
                 Mode = "payment",
-                SuccessUrl = $"{domain}/payment-success?session_id={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = $"{domain}/payment-cancelled"
+                SuccessUrl = $"{_frontstripe.Domain}/payment-success?session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{_frontstripe.Domain}/payment-cancelled"
             };
 
             var service = new SessionService();
@@ -253,9 +256,6 @@ namespace Club_System_API.Services
                         UnitAmountDecimal = usermembership.Membership.Price * 100,
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-                            Images = string.IsNullOrWhiteSpace(usermembership.Membership.Image?.ToString())
-                                ? null
-                                : new List<string> {usermembership.Membership.Image.ToString() },
                             Name = usermembership.Membership.Name,
                             Description = usermembership.Membership.Description,
 
@@ -265,8 +265,8 @@ namespace Club_System_API.Services
                 }
             },
                 Mode = "payment",
-                SuccessUrl = $"{domain}/payment-success?session_id={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = $"{domain}/payment-cancelled"
+                SuccessUrl = $"{_frontstripe.Domain}/payment-success?session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{_frontstripe.Domain}/payment-cancelled"
             };
 
             var service = new SessionService();
@@ -361,6 +361,8 @@ namespace Club_System_API.Services
             return Result.Success(response);
         
         }
+      
+
 
 
         public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken)

@@ -4,11 +4,13 @@
          int Id,
          string FirstName,
          string LastName,
+         string PhoneNumber,
          string Specialty,
          string? Bio,
          double AverageRating,
          string? ContentType,
-        string? Base64Data
+        string? Base64Data,
+        bool IsDisabled
 
 
         );

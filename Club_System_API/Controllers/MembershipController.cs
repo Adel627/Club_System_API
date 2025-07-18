@@ -68,6 +68,7 @@ namespace Club_System_API.Controllers
             return result.IsSuccess ? Ok() : result.ToProblem();
         }
 
+       
         // Create Stripe Checkout Session to pay for selected membership.
         [Authorize]
         [HttpPost("select")]
