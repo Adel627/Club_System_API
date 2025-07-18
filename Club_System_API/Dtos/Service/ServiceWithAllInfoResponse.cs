@@ -1,8 +1,8 @@
 ﻿
-
 using Club_System_API.Dtos.Appointment;
 using Club_System_API.Dtos.Coaches;
 using Club_System_API.Dtos.ServiceReview;
+using Club_System_API.Models;
 
 namespace Club_System_API.Dtos.Service
 {
@@ -11,12 +11,13 @@ namespace Club_System_API.Dtos.Service
         int Id,
         string Name,
         decimal Price,
+        string? Bio,
         string Description,
-        double AverageRating,
         string? ContentType,
         string? Base64Data,
-        ICollection<CoachResponse> coaches,
-        ICollection<AppointmentOfServiceResponse> appointments,
+        ICollection<string> Images,
+        double AverageRating,
+        ICollection<TimeTableResponse> TimeTable,
         ICollection<ServiceReviewWithUserImageResponse> reviews
 
 

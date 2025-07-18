@@ -11,6 +11,7 @@
         public string Day { get; set; }
         public TimeOnly Time { get; set; }
         public int? Duration {  get; set; }
+        public string? TrainingCategory {  get; set; }= default!;
         public int MaxAttenderNum { get; set; }
         public int CurrentAttenderNum { get; set; }
     }

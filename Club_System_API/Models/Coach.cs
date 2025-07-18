@@ -7,6 +7,7 @@
         public string LastName { get; set; } = string.Empty;
         public string Specialty { get; set; } = string.Empty;
         public string? Bio { get; set; }
+        public string? Description { get; set; }
         public DateOnly Birth_Of_Date { get; set; }
         public DateOnly Joined { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         public bool IsDisabled { get; set; }
@@ -18,6 +19,7 @@
         public double AverageRating {  get; set; }
         public ICollection<ServiceCoach> Services { get; set; } = default!;
         public ICollection<CoachReview> Rating { get; set; }= default!;
+        public ICollection<Achievment> achievments { get; set; }= default!;
 
     }
 }

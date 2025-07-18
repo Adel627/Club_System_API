@@ -19,7 +19,7 @@ namespace Club_System_API.Services
         {
             if (!await _context.Bookings.Include(x => x.Appointment)
                 .Where(x => x.UserId == userid)
-                .AnyAsync(x => x.Appointment.CoachId == request.CoachId))
+                .AnyAsync(x => x.Appointment.CoachId == request.CoachId && x.IsPaid==true))
                 return Result.Failure<ReviewCoachResponse>(CoachReviewErrors.NotAllowedTOReview);
             if (request.Rating > 5)
                 return Result.Failure<ReviewCoachResponse>(CoachErrors.InvalidRate);

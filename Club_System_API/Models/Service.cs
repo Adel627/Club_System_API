@@ -4,7 +4,9 @@
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
+
         public decimal Price { get; set; }
+        public string? Bio { get; set; } = string.Empty;
         public string Description { get; set; }=string.Empty;
         public double AverageRating { get; set; }
 
@@ -16,6 +18,7 @@
         public ICollection<ServiceCoach> coaches { get; set; } = default!;
         public ICollection<ServiceReview> reviews { get; set; } = default!;
         public ICollection<Appointment> appointments { get; set; } = default!;
+        public ICollection<Image> images { get; set; } = default!;
 
     }
 }

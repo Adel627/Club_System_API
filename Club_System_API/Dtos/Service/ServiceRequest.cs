@@ -4,6 +4,7 @@
 
          string Name,
          decimal Price,
+         string? Bio,
         string Description,
         IFormFile? Image
 

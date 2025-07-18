@@ -7,6 +7,7 @@ namespace Club_System_API.Dtos.Coaches
          string LastName,
          string Specialty, 
          string Bio,
+         string? Description,
          DateOnly Birth_Of_Date ,
          string PhoneNumber,
          int Salary ,

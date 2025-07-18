@@ -77,6 +77,7 @@ namespace Club_System_API.Services
            
             currentAppointment.Day = request.Day;
             currentAppointment.Time = request.Time;
+            currentAppointment.TrainingCategory = request.TrainingCategory;
             currentAppointment.MaxAttenderNum = request.MaxAttenderNum;
             await _context.SaveChangesAsync(cancellationToken);
 

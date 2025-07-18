@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Club_System_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250717225642_deleteMembershipid")]
+    partial class deleteMembershipid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +34,7 @@ namespace Club_System_API.Migrations
 
                     b.HasKey("coachId", "Name");
 
-                    b.ToTable("Achievment", (string)null);
+                    b.ToTable("Achievment");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.ApplicationUser", b =>
@@ -187,7 +190,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("Appointments", (string)null);
+                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.Booking", b =>
@@ -229,7 +232,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.ClubReview", b =>
@@ -259,7 +262,7 @@ namespace Club_System_API.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("clubReviews", (string)null);
+                    b.ToTable("clubReviews");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.Coach", b =>
@@ -322,7 +325,7 @@ namespace Club_System_API.Migrations
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
-                    b.ToTable("Coachs", (string)null);
+                    b.ToTable("Coachs");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.CoachReview", b =>
@@ -347,7 +350,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CoachReviews", (string)null);
+                    b.ToTable("CoachReviews");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.Feature", b =>
@@ -369,7 +372,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("MembershipId");
 
-                    b.ToTable("Features", (string)null);
+                    b.ToTable("Features");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.Image", b =>
@@ -382,7 +385,7 @@ namespace Club_System_API.Migrations
 
                     b.HasKey("ServiceId", "Url");
 
-                    b.ToTable("images", (string)null);
+                    b.ToTable("images");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.Membership", b =>
@@ -418,7 +421,7 @@ namespace Club_System_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Memberships", (string)null);
+                    b.ToTable("Memberships");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.MembershipPayment", b =>
@@ -452,7 +455,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("MembershipPayments", (string)null);
+                    b.ToTable("MembershipPayments");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.QA", b =>
@@ -485,7 +488,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("QAs", (string)null);
+                    b.ToTable("QAs");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.RefreshToken", b =>
@@ -517,7 +520,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.Service", b =>
@@ -556,7 +559,7 @@ namespace Club_System_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.ServiceCoach", b =>
@@ -574,7 +577,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("CoachId");
 
-                    b.ToTable("ServiceCoaches", (string)null);
+                    b.ToTable("ServiceCoaches");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.ServiceReview", b =>
@@ -599,7 +602,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ServiceReviews", (string)null);
+                    b.ToTable("ServiceReviews");
                 });
 
             modelBuilder.Entity("Club_System_API.Models.UserMembership", b =>
@@ -629,7 +632,7 @@ namespace Club_System_API.Migrations
 
                     b.HasIndex("MembershipId");
 
-                    b.ToTable("UserMemberships", (string)null);
+                    b.ToTable("UserMemberships");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

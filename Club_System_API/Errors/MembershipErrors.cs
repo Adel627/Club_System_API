@@ -16,6 +16,8 @@ namespace Club_System_API.Errors
         public static readonly Error CanNotRenwal =
         new("Renwal.NotAllowed", "You Can Renwal Your MemberShip in The Last 6 Month only", StatusCodes.Status405MethodNotAllowed);
 
+        public static readonly Error NotAllowd =
+        new("Subscription.NotAllowed", "You Can  not Subscripe in two membership", StatusCodes.Status405MethodNotAllowed);
 
     }
 }

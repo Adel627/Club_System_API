@@ -6,7 +6,8 @@ namespace Club_System_API.Dtos.Service
     
          int Id ,
          string Name ,
-         decimal Price, 
+         decimal Price,
+         string? Bio,
         string Description,
         double AverageRating,
         string? ContentType,

@@ -30,6 +30,16 @@ namespace Club_System_API.Controllers
 
         }
 
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
+        [HttpPost("image/{serviceid}")]
+        public async Task<IActionResult> AddImage([FromRoute] int serviceid, ImageRequest request,
+       CancellationToken cancellationToken)
+        {
+            var result = await _serviceService.AddImageAsync(serviceid, request, cancellationToken);
+            return result.IsSuccess ? Created() : result.ToProblem();
+
+        }
+
         [HttpGet("")]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {

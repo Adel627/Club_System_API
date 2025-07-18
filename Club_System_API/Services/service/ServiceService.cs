@@ -20,7 +20,7 @@ namespace Club_System_API.Services.service
             _context = context;
         }
 
-        public async Task<Result<ServiceResponse>> AddAsync([FromForm] ServiceRequest serviceRequest, CancellationToken cancellationToken = default)
+        public async Task<Result<ServiceResponse>> AddAsync(ServiceRequest serviceRequest, CancellationToken cancellationToken = default)
         {
             var service = serviceRequest.Adapt<Service>(); 
            await _context.AddAsync(service,cancellationToken);
@@ -28,7 +28,22 @@ namespace Club_System_API.Services.service
             return Result.Success(service.Adapt<ServiceResponse>());
         }
 
-       
+
+        public async Task<Result> AddImageAsync(int serviceid, ImageRequest Request, CancellationToken cancellationToken = default)
+        {
+            var service = await _context.Services.FindAsync(serviceid, cancellationToken);
+            if (service is null)
+                return Result.Failure(ServiceErrors.ServiceNotFound);
+
+            if (_context.images.Where(x => x.ServiceId == serviceid).Any(x => x.Url == Request.Url))
+                return Result.Failure(ServiceErrors.DuplicatedImage);
+
+            var image = new Image { ServiceId = serviceid, Url = Request.Url };
+            await _context.AddAsync(image, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
+
 
         public async Task<IEnumerable<ServiceResponse>> GetAllAsync(CancellationToken cancellationToken = default)
         {
@@ -41,29 +56,36 @@ namespace Club_System_API.Services.service
         public async Task<Result<ServiceWithAllInfoResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
         {
             var service = await _context.Services
-                   .Include(s => s.coaches)
-                   .ThenInclude(sc => sc.Coach)
-                   .Include(s => s.reviews)
-                   .ThenInclude(r => r.User)
-                   .Include(s => s.appointments)
-                   .AsNoTracking()
-                   .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+                .Include(s => s.images)
+                .Include(s => s.reviews).ThenInclude(c => c.User)
+                .Include(s => s.appointments).ThenInclude(c => c.Coach).AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+
 
             if ( service is null)
                return  Result.Failure<ServiceWithAllInfoResponse>(ServiceErrors.ServiceNotFound);
 
-            var imageData = service.Image != null ? Convert.ToBase64String(service.Image) : null;
 
             var response = new ServiceWithAllInfoResponse(
                 service.Id,
                 service.Name,
                 service.Price,
+                service.Bio,
                 service.Description,
-                service.AverageRating,
                 service.ImageContentType,
-                imageData,
-                service.coaches.Select(sc => sc.Coach.Adapt<CoachResponse>()).ToList(),
-                service.appointments.Select(a => a.Adapt<AppointmentOfServiceResponse>()).ToList(),
+                service.Image != null ? Convert.ToBase64String(service.Image) : null,
+                service.images.Select(si => si.Url).ToList(),
+                service.AverageRating,
+                service.appointments.Select(s => new TimeTableResponse(
+                        s.CoachId,
+                        s.Coach.FirstName +" "+ s.Coach.FirstName ,
+                        s.Day,
+                        s.Time,
+                        s.TrainingCategory != null? s.TrainingCategory : null,
+                        s.MaxAttenderNum,
+                        s.CurrentAttenderNum,
+                        s.Duration
+                        )).ToList(),
                 service.reviews.Select(r => new ServiceReviewWithUserImageResponse(
                     r.User.ImageContentType,
                     r.User.Image != null ? $"data:{r.User.ImageContentType};base64,{Convert.ToBase64String(r.User.Image)}": null,
@@ -89,6 +111,7 @@ namespace Club_System_API.Services.service
 
             currentService.Name = request.Name;
             currentService.Price = request.Price;
+            currentService.Bio = request.Bio;
             currentService.Description = request.Description;
             if (request.Image is not null)
             {

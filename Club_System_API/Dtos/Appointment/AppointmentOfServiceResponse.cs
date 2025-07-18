@@ -8,6 +8,7 @@
       string Day,
       TimeOnly? Time,
       int? Duration,
+      string? TrainingCategory,
       int MaxAttenderNum,
       int CurrentAttenderNum
         );

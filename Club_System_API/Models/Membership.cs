@@ -20,6 +20,5 @@
 
         public ICollection<Feature> Features { get; set; }=new List<Feature>();
         public DateTime? CreatedAt { get; set; }=DateTime.UtcNow;
-        public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
     }
 } 

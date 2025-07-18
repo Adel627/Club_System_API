@@ -1,6 +1,7 @@
 ﻿using Club_System_API.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -22,7 +23,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<MembershipPayment> MembershipPayments { get; set; }
     public DbSet<UserMembership> UserMemberships { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
-
+     public DbSet<Achievment> Achievment { get; set; }
+     public DbSet<Image> images { get; set; }
     public DbSet<Feature> Features { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

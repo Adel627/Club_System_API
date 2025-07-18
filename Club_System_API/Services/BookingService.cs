@@ -37,6 +37,7 @@ namespace Club_System_API.Services
             {
                 
                 await _userManager.RemoveFromRolesAsync(usermembership.ApplicationUser,[ nameof(DefaultRoles.Member)]);
+
                 return Result.Failure<BookingResponse>(MembershipErrors.MembershipExpired);
             }
             var appointment = await _context.Appointments

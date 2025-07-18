@@ -13,5 +13,7 @@ public class UpdateProfileRequestValidator : AbstractValidator<UpdateProfileRequ
         RuleFor(x => x.LastName)
             .NotEmpty()
             .Length(3, 100);
+
+       
     }
 }

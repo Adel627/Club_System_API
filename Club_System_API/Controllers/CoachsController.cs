@@ -32,6 +32,16 @@ namespace Club_System_API.Controllers
 
         }
 
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
+        [HttpPost("Achievment/{coachid}")]
+        public async Task<IActionResult> AddAchievment([FromRoute] int coachid, AchievmentRequest request,
+       CancellationToken cancellationToken)
+        {
+            var result = await _coachService.AddAchievmentAsync(coachid,request, cancellationToken);
+            return result.IsSuccess ? Created() : result.ToProblem();
+
+        }
+
 
         [HttpGet("")]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
@@ -39,7 +49,6 @@ namespace Club_System_API.Controllers
             return Ok(await _coachService.GetAllAsync(cancellationToken));
         }
 
-        [Authorize(Roles = nameof(DefaultRoles.Admin))]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
         {
@@ -69,6 +78,14 @@ namespace Club_System_API.Controllers
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 
+        [Authorize(Roles = nameof(DefaultRoles.Admin))]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            var result = await _coachService.DeleteAsync(id, cancellationToken);
+
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
 
     }
 }

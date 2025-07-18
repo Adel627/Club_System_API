@@ -18,5 +18,9 @@ namespace Club_System_API.Errors
         public static readonly Error InvalidRate =
        new("User.InvalidRate", "the Rate Should be Less Than or Equal to 5", StatusCodes.Status400BadRequest);
 
+        public static readonly Error DuplicatedAchievment =
+      new("coach.DuplicatedAchievment", "This Achievment is already exists", StatusCodes.Status409Conflict);
+
+
     }
 }

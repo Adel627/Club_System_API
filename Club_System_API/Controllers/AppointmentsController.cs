@@ -54,7 +54,7 @@ namespace Club_System_API.Controllers
         [HttpGet("appointmsOfcoach/{coachid}")]
         public async Task<IActionResult> GetAllOfCoachAsync([FromRoute] int coachid, CancellationToken cancellationToken)
         {
-            var result = await _appointmentService.GetAllOfServiceAsync(coachid, cancellationToken);
+            var result = await _appointmentService.GetAllOfCoachAsync(coachid, cancellationToken);
 
             return Ok(result);
         }

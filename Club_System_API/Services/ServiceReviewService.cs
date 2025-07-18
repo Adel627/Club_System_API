@@ -17,10 +17,10 @@ namespace Club_System_API.Services
 
             if (!await _context.Bookings.Include(x => x.Appointment)
                 .Where(x => x.UserId == userid)
-                .AnyAsync(x => x.Appointment.CoachId == request.ServiceId))
+                .AnyAsync(x => x.Appointment.ServiceId == request.ServiceId && x.IsPaid==true))
                 return Result.Failure<ServiceReviewResponse>(ServiceReviewErrors.NotAllowedTOReview);
-
-
+            
+            
             if (request.Rating > 5)
                 return Result.Failure<ServiceReviewResponse>(ServiceReviewErrors.InvalidRate);
 

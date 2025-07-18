@@ -24,7 +24,10 @@ public class UserService(UserManager<ApplicationUser> userManager,
     public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
     {
         var user = await _userManager.Users
+            .Include(x=> x.UserMemberships).ThenInclude(x=> x.Membership)
+            .Include(x=> x.Bookings).ThenInclude(x=> x.Appointment).ThenInclude(x=> x.Service)
             .Where(x => x.Id == userId)
+            .AsNoTracking()
             .ProjectToType<UserProfileResponse>()
             .SingleAsync();
 
@@ -33,14 +36,16 @@ public class UserService(UserManager<ApplicationUser> userManager,
 
     public async Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request)
     {
-
+        
         await _userManager.Users
             .Where(x => x.Id == userId)
             .ExecuteUpdateAsync(setters =>
                 setters
                     .SetProperty(x => x.FirstName, request.FirstName)
                     .SetProperty(x => x.LastName, request.LastName)
-                    .SetProperty(x => x.Image, FormFileExtensions.ConvertToBytes(request.Image))
+
+                    .SetProperty(x => x.Image,request.Image==null?null: FormFileExtensions.ConvertToBytes(request.Image))
+                    .SetProperty(x => x.ImageContentType, request.Image == null ? null : request.Image.ContentType)
             );
 
         return Result.Success();
@@ -62,7 +67,7 @@ public class UserService(UserManager<ApplicationUser> userManager,
 
 
     public async Task<IEnumerable<UserResponse>> GetAllAsync(CancellationToken cancellationToken = default) =>
-             await (from u in _context.Users
+             await (from u in _context.Users.Include(u=> u.UserMemberships).ThenInclude(u=>u.Membership)
                     join ur in _context.UserRoles
                     on u.Id equals ur.UserId into userRoles
                     from ur in userRoles.DefaultIfEmpty()  // Ensure users without roles are included
@@ -78,13 +83,14 @@ public class UserService(UserManager<ApplicationUser> userManager,
                         u.FirstName,
                         u.LastName,
                         u.Birth_Of_Date,
-                        u.MembershipId,
+                        u.JoinedAt,
+                        MembershipName = u.UserMemberships.Select(x => x.Membership.Name).FirstOrDefault(),
                         u.ImageContentType,
                         u.Image,
                         u.IsDisabled,
                         RoleName = r != null ? r.Name : null
                     })
-                    .GroupBy(u => new { u.Id,u.PhoneNumber, u.FirstName, u.LastName, u.MembershipNumber, u.Birth_Of_Date, u.MembershipId, u.ImageContentType, u.Image, u.IsDisabled })
+                    .GroupBy(u => new { u.Id,u.PhoneNumber, u.FirstName, u.LastName, u.MembershipNumber, u.Birth_Of_Date,u.JoinedAt, u.MembershipName, u.ImageContentType, u.Image, u.IsDisabled })
                     .Select(u => new UserResponse
                     (
                         u.Key.Id,
@@ -93,9 +99,10 @@ public class UserService(UserManager<ApplicationUser> userManager,
                         u.Key.FirstName,
                         u.Key.LastName,
                         u.Key.Birth_Of_Date,
-                        u.Key.MembershipId,
+                        u.Key.JoinedAt, 
+                        u.Key.MembershipName,
                         u.Key.ImageContentType,
-                        $"data:{u.Key.ImageContentType};base64,{Convert.ToBase64String(u.Key.Image)}",
+                        u.Key.Image!=null? $"data:{u.Key.ImageContentType};base64,{Convert.ToBase64String(u.Key.Image)}":null,
                         u.Key.IsDisabled,
                         u.Where(x => x.RoleName != null).Select(x => x.RoleName).Distinct().ToList() // Ensure distinct roles
                     ))
@@ -104,7 +111,10 @@ public class UserService(UserManager<ApplicationUser> userManager,
 
     public async Task<Result<UserResponse>> GetAsync(string id)
     {
-        if (await _userManager.FindByIdAsync(id) is not { } user)
+        var user = await _context.Users.Include(x=> x.UserMemberships)
+            .ThenInclude(x=>x.Membership)
+            .SingleOrDefaultAsync(x => x.Id == id);
+        if (user is null)
             return Result.Failure<UserResponse>(UserErrors.UserNotFound);
 
         var userRoles = await _userManager.GetRolesAsync(user);

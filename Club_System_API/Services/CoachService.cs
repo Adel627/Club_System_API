@@ -22,27 +22,46 @@ namespace Club_System_API.Services
             if (PhonenumberIsExist)
                return Result.Failure<CoachResponse>(CoachErrors.DuplicatedPhoneNumber);
 
-            var coach = request.Adapt<Coach>();
+            var coach = request.Adapt<CoachWithReviewsResponse>();
           await _context.AddAsync(coach, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success(coach.Adapt<CoachResponse>());
         }
+        public async Task<Result> AddAchievmentAsync(int coachid, AchievmentRequest request, CancellationToken cancellationToken = default)
+        {
+            var coach = await _context.Coachs.FindAsync(coachid, cancellationToken);
+            if (coach is null)
+                return Result.Failure(CoachErrors.CoachNotFound);
+
+            if (_context.Achievment.Where(x => x.coachId == coachid).Any(x => x.Name == request.Achievment))
+                return Result.Failure(CoachErrors.DuplicatedAchievment);
+
+                var achivment = new Achievment { coachId = coachid, Name = request.Achievment };
+            await _context.AddAsync(achivment, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
 
         public async Task<IEnumerable<CoachResponse>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.Coachs
+            return await _context.Coachs.Where(x=> x.IsDisabled!=true)
            .AsNoTracking()
            .ProjectToType<CoachResponse>()
            .ToListAsync(cancellationToken);
         }
 
-        public async Task<Result<CoachResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Result<CoachWithReviewsResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
         {
-            var coach = await _context.Coachs.FindAsync(id, cancellationToken);
+            var coach = await _context.Coachs.Include(c => c.Rating)
+                .ThenInclude(c => c.User)
+                .Include(c=> c.achievments)
+                .SingleOrDefaultAsync(x => x.Id == id);
+             
+
 
             return coach is not null
-                ? Result.Success(coach.Adapt<CoachResponse>())
-                : Result.Failure<CoachResponse>(CoachErrors.CoachNotFound);
+                ? Result.Success(coach.Adapt<CoachWithReviewsResponse>())
+                : Result.Failure<CoachWithReviewsResponse>(CoachErrors.CoachNotFound);
         }
 
         public async Task<Result> UpdateAsync(int id, CoachRequest request, CancellationToken cancellationToken = default)
@@ -57,6 +76,7 @@ namespace Club_System_API.Services
             currentCoach.LastName = request.LastName;
             currentCoach.Specialty = request.Specialty;
             currentCoach.Bio=request.Bio;
+            currentCoach.Description = request.Description;
             currentCoach.Birth_Of_Date = request.Birth_Of_Date;
             currentCoach.PhoneNumber = request.PhoneNumber;
             currentCoach.Salary = request.Salary;
@@ -84,6 +104,20 @@ namespace Club_System_API.Services
 
 
         }
+        public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var coach = await _context.Coachs.FindAsync(id);
 
+            if (coach is null)
+                return Result.Failure(CoachErrors.CoachNotFound);
+
+            _context.Remove(coach);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success();
+        }
+
+        
     }
 }

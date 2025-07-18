@@ -20,8 +20,8 @@ namespace Club_System_API.Models
         public ICollection<CoachReview> CoachRating { get; set; } = default!;
         public ICollection<Booking> Bookings { get; set; } = default!;
         public ICollection<ServiceReview> ServiceReviews { get; set; } = default!;
+        public ICollection<UserMembership> UserMemberships { get; set; } = new List<UserMembership>();
 
-        public int? MembershipId { get; set; }
-        public Membership? Membership { get; set; }
+
     }
 }

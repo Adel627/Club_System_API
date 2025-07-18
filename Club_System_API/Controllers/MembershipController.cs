@@ -59,6 +59,15 @@ namespace Club_System_API.Controllers
             var result = await _membershipService.AssignToUserAsync(phonenumber, membershipId);
             return result.IsSuccess ? Ok() : result.ToProblem();
         }
+
+        [Authorize]
+        [HttpPost("CancelMyMembership")]
+        public async Task<IActionResult> Cancel(CancellationToken cancellationToken)
+        {
+            var result = await _membershipService.Cancel(User.GetUserId(),cancellationToken);
+            return result.IsSuccess ? Ok() : result.ToProblem();
+        }
+
         // Create Stripe Checkout Session to pay for selected membership.
         [Authorize]
         [HttpPost("select")]

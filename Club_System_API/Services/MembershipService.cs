@@ -81,11 +81,14 @@ namespace Club_System_API.Services
 
         public async Task<Result> AssignToUserAsync(string phonenumber, int membershipId)
         {
+            var user = await _context.Users.FindAsync(phonenumber);
+            if (user is not null)
+                return Result.Failure<string>(MembershipErrors.NotAllowd);
+
             var membership = await _context.Memberships.FindAsync(membershipId);
             if (membership == null)
                 return Result.Failure(MembershipErrors.MembershipNotFound);
 
-            var user = await _context.Users.FindAsync(phonenumber);
             if (user == null)
                 return Result.Failure(UserErrors.UserNotFound);
 
@@ -112,10 +115,27 @@ namespace Club_System_API.Services
             return Result.Success(_mapper.Map<MembershipResponse>(membership));
         }
 
+        public async Task<Result> Cancel(string userid,CancellationToken cancellationToken)
+        {
+            var UserMemberShip =await _context.UserMemberships
+                .SingleOrDefaultAsync(x => x.ApplicationUserId == userid);
+            if (UserMemberShip is  null)
+                return Result.Failure<string>(MembershipErrors.MembershipNotFound);
+
+            _context.Remove(UserMemberShip);   
+           await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
+
         public async Task<Result<string>> CreateStripeCheckoutSessionAsync(string userId, int membershipId, string domain)
         {
+            if(await _context.UserMemberships.AnyAsync(x=> x.ApplicationUserId == userId))
+                return Result.Failure<string>(MembershipErrors.NotAllowd);
+
             var membership = await _context.Memberships.FindAsync(membershipId);
-            if (membership == null) return Result.Failure<string>(MembershipErrors.MembershipNotFound);
+
+            if (membership == null)
+                return Result.Failure<string>(MembershipErrors.MembershipNotFound);
 
             var options = new SessionCreateOptions
             {
@@ -131,9 +151,10 @@ namespace Club_System_API.Services
                         UnitAmountDecimal = membership.Price * 100,
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-                            Images = string.IsNullOrWhiteSpace(membership.Image?.ToString())
-                                ? null
-                                : new List<string> { membership.Image.ToString() },
+
+                            //Images = string.IsNullOrWhiteSpace(membership.Image?.ToString())
+                            //    ? null
+                            //    : new List<string> { membership.Image.ToString() },
                             Name = membership.Name,
                             Description = membership.Description,
 
